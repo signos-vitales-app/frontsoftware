@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URL base
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://backsoftware.onrender.com/api";
 
 // Registrar un paciente
 export const registerPatient = async (patientData, token) => {

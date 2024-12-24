@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://backsoftware.onrender.com/api";
 
 // Función para obtener todos los logs de trazabilidad
 export const getAllTrazabilidad = async () => {

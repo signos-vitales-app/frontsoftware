@@ -8,7 +8,7 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
 
         // Llamada al backend para registrar la descarga en trazabilidad
         await axios.get(
-            `http://localhost:5000/api/patients/${patientInfo.id}/download`, // URL del backend
+            `https://backsoftware.onrender.com/api/patients/${patientInfo.id}/download`, // URL del backend
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`, // Token del usuario
