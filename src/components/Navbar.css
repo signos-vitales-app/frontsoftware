@@ -1,0 +1,137 @@
+.navbar {
+    display: flex; /* Utiliza un contenedor flexible para alinear los elementos del navbar. */
+    justify-content: space-between; /* Espacia los elementos del navbar equitativamente entre los extremos. */
+    align-items: center; /* Centra verticalmente los elementos dentro del navbar. */
+    background-color: #007bff; /* Define el color de fondo azul para el navbar. */
+    padding: 14px 20px; /* Es para el ancho y xd Agrega espacio interno (padding): 10px arriba/abajo y 20px izquierda/derecha. */
+    position: fixed; /* Fija el navbar en la parte superior de la pantalla, incluso al desplazarse. */
+    top: 0; /* Posiciona el navbar en la parte superior de la pantalla. */
+    width: 100%; /* Establece que el navbar ocupe el ancho completo de la pantalla. */
+    z-index: 1000; /* Asegura que el navbar esté por encima de otros elementos con un índice más bajo. */
+  }
+  
+  .navbar-left {
+    display: flex; /* Crea un contenedor flexible para alinear elementos del lado izquierdo. */
+    align-items: center; /* Centra verticalmente los elementos dentro de este contenedor. */
+  }
+  
+  .navbar-logo {
+    font-size: 25px; /* Establece el tamaño de la fuente para el ícono/logo. */
+    color: white; /* Cambia el color del ícono/logo a blanco. */
+    margin-right: 10px; /* Agrega espacio a la derecha del ícono/logo. */
+  }
+  
+  .navbar-title {
+    color: white; /* Cambia el color del título a blanco. */
+    font-size: 20px; /* Establece el tamaño de la fuente del título. */
+    font-weight: bold; /* Hace que el título sea negrita. */
+  }
+  
+  .navbar-right {
+    position: relative; /* Permite que los elementos secundarios (como el menú desplegable) se posicionen con relación a este contenedor. */
+    display: flex; /* Crea un contenedor flexible para alinear los elementos del lado derecho. */
+    align-items: center; /* Centra verticalmente los elementos dentro de este contenedor. */
+  }
+  
+  .settings-btn {
+    background-color: transparent; /* Hace que el botón no tenga un fondo visible. */
+    border: none; /* Elimina los bordes del botón. */
+    color: white; /* Cambia el color del texto e íconos a blanco. */
+    font-size: 24px; /* Establece el tamaño de la fuente para el ícono. */
+    cursor: pointer; /* Cambia el cursor a una mano al pasar sobre el botón. */
+    display: flex; /* Crea un contenedor flexible para el ícono y el texto. */
+    align-items: center; /* Centra verticalmente el ícono y el texto dentro del botón. */
+  }
+  
+  .settings-text {
+    margin-left: 5px; /* Agrega espacio a la izquierda del texto de configuración. */
+    font-size: 16px; /* Establece el tamaño de la fuente del texto. */
+  }
+  
+  .dropdown-menu {
+    position: absolute; /* Posiciona el menú desplegable con respecto al contenedor padre. */
+    top: 40px; /* Define la distancia del menú con respecto al botón de configuración. */
+    right: 0; /* Alinea el menú con el borde derecho del contenedor padre. */
+    background-color: white; /* Cambia el fondo del menú a blanco. */
+    border: 1px solid #ccc; /* Agrega un borde gris claro al menú. */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Agrega una sombra para dar efecto de elevación. */
+    width: 200px; /* Establece el ancho del menú desplegable. */
+    border-radius: 5px; /* Redondea las esquinas del menú. */
+    z-index: 1100; /* Asegura que el menú esté por encima de otros elementos. */
+    overflow: hidden; /* Oculta cualquier contenido que se desborde del contenedor del menú. */
+  }
+  
+  .dropdown-menu.show {
+    display: block; /* Muestra el menú desplegable cuando tiene la clase "show". */
+  }
+  
+  .dropdown-menu button {
+    background-color: transparent; /* Elimina el fondo del botón en el menú desplegable. */
+    border: none; /* Elimina los bordes del botón. */
+    padding: 10px; /* Agrega espacio interno en el botón. */
+    width: 100%; /* Hace que el botón ocupe el ancho completo del menú. */
+    text-align: left; /* Alinea el texto del botón hacia la izquierda. */
+    cursor: pointer; /* Cambia el cursor a una mano al pasar sobre el botón. */
+    font-size: 14px; /* Establece el tamaño de la fuente del botón. */
+    color: #333; /* Cambia el color del texto a gris oscuro. */
+    display: flex; /* Crea un contenedor flexible dentro del botón. */
+    align-items: center; /* Centra verticalmente los elementos dentro del botón. */
+  }
+  
+  .dropdown-menu button svg {
+    margin-right: 8px; /* Agrega espacio a la derecha de cualquier ícono SVG dentro del botón. */
+  }
+  
+  .dropdown-menu button:hover {
+    background-color: #f1f1f1; /* Cambia el fondo del botón al pasar el mouse sobre él. */
+  }
+  
+  /* Modal de confirmación */
+  .modal {
+    position: fixed; /* Fija el modal en la pantalla, incluso al desplazarse. */
+    top: 0; /* Posiciona el modal en la parte superior de la pantalla. */
+    left: 0; /* Posiciona el modal en el lado izquierdo de la pantalla. */
+    width: 100%; /* Hace que el modal ocupe el ancho completo de la pantalla. */
+    height: 100%; /* Hace que el modal ocupe el alto completo de la pantalla. */
+    background-color: rgba(0, 0, 0, 0.5); /* Agrega un fondo semitransparente oscuro. */
+    display: flex; /* Crea un contenedor flexible para centrar el contenido del modal. */
+    justify-content: center; /* Centra horizontalmente el contenido del modal. */
+    align-items: center; /* Centra verticalmente el contenido del modal. */
+    z-index: 2000; /* Asegura que el modal esté por encima de otros elementos. */
+  }
+  
+  .modal-content {
+    background-color: white; /* Cambia el fondo del contenido del modal a blanco. */
+    padding: 20px; /* Agrega espacio interno dentro del modal. */
+    border-radius: 10px; /* Redondea las esquinas del modal. */
+    text-align: center; /* Centra el texto dentro del modal. */
+    width: 300px; /* Establece el ancho del modal. */
+  }
+  
+  .modal-btn {
+    padding: 10px 20px; /* Agrega espacio interno a los botones del modal. */
+    border: none; /* Elimina los bordes de los botones. */
+    border-radius: 5px; /* Redondea las esquinas de los botones. */
+    margin: 10px; /* Agrega espacio alrededor de los botones. */
+    cursor: pointer; /* Cambia el cursor a una mano al pasar sobre los botones. */
+    font-size: 14px; /* Establece el tamaño de la fuente del botón. */
+  }
+  
+  .modal-btn.yes {
+    background-color: #08da4e; /* Cambia el fondo del botón "Sí" a verde. */
+    color: white; /* Cambia el color del texto del botón "Sí" a blanco. */
+  }
+  
+  .modal-btn.no {
+    background-color: #e04343; /* Cambia el fondo del botón "No" a rojo. */
+    color: white; /* Cambia el color del texto del botón "No" a blanco. */
+  }
+  
+  .ajustes-texto {
+    font-size: 20px; /* Tamaño de fuente más pequeño */
+    font-family: 'Montserrat', sans-serif; /* Tipografía simple y elegante */
+    font-weight: 500; /* Peso moderado para no hacerlo tan grueso */
+    color: white; /* Asegurando que el texto sea blanco */
+    margin-left: 8px; /* Espaciado entre el ícono y el texto */
+    text-transform: capitalize; /* Para que "ajustes" se vea con la primera letra en mayúscula */
+  }
