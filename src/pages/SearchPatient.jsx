@@ -25,6 +25,7 @@ const SearchPatient = () => {
     useEffect(() => {
         loadPatients();
     }, []);
+    const role = localStorage.getItem('role');
 
     useEffect(() => {
         if (isScanning) {
@@ -308,8 +309,7 @@ const SearchPatient = () => {
                         <th className="p-4">Número de identificación</th>
                         <th className="p-4">Ubicación</th>
                         <th className="p-4">Estado</th>
-                        <th className="p-4">Responsable</th> {/* Nueva columna */}
-                        <th className="p-4">Editar</th>
+                        {role === "jefe" && <th className="p-1">Responsable</th>}                        <th className="p-4">Editar</th>
                         <th className="p-4">Seleccionar</th>
                     </tr>
                 </thead>
@@ -337,8 +337,8 @@ const SearchPatient = () => {
                                     {patient.status === "activo" ? "Activo" : "Inactivo"}
                                 </button>
                             </td>
-                            <td className="p-4">{patient.responsable_username || "No asignado"}</td> {/* Nuevo dato */}
-                            <td className="p-6">
+                            {role === "jefe" && (
+                                                <td className="p-4">{patient.responsable_username || "No asignado"}</td>)}                            <td className="p-6">
                                 <button
                                     onClick={() => handleEdit(patient.id)}
                                     className="text-blue-600 hover:text-blue-800 font-semibold"
