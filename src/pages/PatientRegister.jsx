@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { registerPatient } from "../services/patientService";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { FaUserPlus, FaClipboard, FaSave } from 'react-icons/fa';  // Usamos FaClipboard para el icono de planilla
+import {FaSave } from 'react-icons/fa';  // Usamos FaClipboard para el icono de planilla
 import { FiHome } from 'react-icons/fi';  // Usamos FaClipboard para el icono de planilla
 
 const PatientRegister = () => {

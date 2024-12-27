@@ -174,8 +174,8 @@ const EditPatient = () => {
                     className="w-full max-w-lg p-8 bg-white rounded-lg shadow-lg my-8"
                 >
                     {/* Encabezado */}
-                    <h2 className="text-3xl font-bold mb-8 text-center text-blue-800 flex items-center justify-center gap-2">
-                        <FaClipboard size={25} /> Editar paciente
+                    <h2 className="text-3xl font-bold mb-8 text-center text-blue-600 flex items-center justify-center gap-2">
+                         📝Editar paciente
                     </h2>
         
                     {/* Campos en Grid */}
@@ -326,7 +326,7 @@ const EditPatient = () => {
                         <button
                             type="button"
                             onClick={handleGoBack}
-                            className="flex items-center px-4 py-2.5 bg-gray-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-600 transition"
+                            className="flex items-center px-4 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-800 transition"
                         >
                             <FiHome size={18} className="mr-2" /> Regresar
                         </button>
