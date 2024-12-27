@@ -7,6 +7,7 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { BiSolidSpreadsheet } from "react-icons/bi";
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const SearchPatient = () => {
     const [patients, setPatients] = useState([]);
@@ -56,9 +57,36 @@ const SearchPatient = () => {
 
     const handleStatusToggle = async (idPaciente, currentStatus) => {
         const newStatus = currentStatus === "activo" ? "inactivo" : "activo";
-        await updatePatientStatus(idPaciente, newStatus);
-        loadPatients();
-    };
+    
+        Swal.fire({
+            title: `¿Estás seguro de que deseas ${newStatus === "inactivo" ? "inactivar" : "activar"} este paciente?`,
+            text: "Puedes cambiar el estado más tarde si lo deseas.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, cambiar estado",
+            cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await updatePatientStatus(idPaciente, newStatus);
+                    loadPatients();
+                    Swal.fire(
+                        "¡Estado cambiado!",
+                        `El paciente ahora está ${newStatus}.`,
+                        "success"
+                    );
+                } catch (error) {
+                    Swal.fire(
+                        "Error",
+                        "No se pudo cambiar el estado del paciente. Inténtalo nuevamente.",
+                        "error"
+                    );
+                }
+            }
+        });
+    }; 
 
     const filteredPatients = patients.filter(patient =>
         patient.numero_identificacion.includes(searchId)
@@ -82,13 +110,13 @@ const SearchPatient = () => {
         const exceptions = ["de", "del", "y"]; // Palabras que deben permanecer en minúsculas
         return text
             .split(" ")
-            .map((word, index) => 
+            .map((word, index) =>
                 exceptions.includes(word.toLowerCase()) && index !== 0
                     ? word.toLowerCase()
                     : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             )
             .join(" ");
-    };    
+    };
 
     // Calcular la paginación
     const totalPages = Math.ceil(sortedPatients.length / patientsPerPage);
@@ -197,13 +225,27 @@ const SearchPatient = () => {
         navigate("/dashboard");
     };
     const handleEdit = (idPaciente) => {
-        navigate(`/edit-patient/${idPaciente}`);
+        Swal.fire({
+            title: "¿Estas seguro de que deseas editar los datos del paciente?",
+            text: "Asegúrate de que esta acción sea intencional.",
+            icon: "question", // Icono de pregunta
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6", // Botón de confirmación azul
+            cancelButtonColor: "#d33",     // Botón de cancelar rojo
+            confirmButtonText: "Sí, editar",
+            cancelButtonText: "Cancelar",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Navegar a la página de edición si el usuario confirma
+                navigate(`/edit-patient/${idPaciente}`);
+            }
+        });
     };
 
     return (
         <div className="flex flex-col items-center min-h-screen bg-gray-50 p-8">
             <h1 className="text-4xl font-bold text-blue-600 mt-10 mb-6">Búsqueda de Pacientes</h1>
-    
+
             {/* Barra de búsqueda */}
             <input
                 type="text"
@@ -212,7 +254,7 @@ const SearchPatient = () => {
                 onChange={(e) => setSearchId(e.target.value)}
                 className="p-3 border border-blue-300 rounded-lg shadow-md w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-gray-800 mb-4"
             />
-    
+
             {/* Botón de solicitar acceso a la cámara */}
             <button
                 onClick={handleOpenQRScanner}
@@ -223,14 +265,14 @@ const SearchPatient = () => {
                     ? "Solicitar acceso a la cámara"
                     : "Escanear Código QR"}
             </button>
-    
+
             {/* Mensaje de error si no hay acceso a la cámara */}
             {cameraPermission === false && (
                 <div className="text-red-500 font-bold mb-6">
                     No se ha concedido acceso a la cámara. Verifique los permisos en su navegador.
                 </div>
             )}
-    
+
             {/* Sección de escaneo de QR */}
             {isScanning && (
                 <div className="flex flex-col items-center justify-center bg-white shadow-lg rounded-lg p-6 w-full max-w-xs mb-6">
@@ -248,12 +290,12 @@ const SearchPatient = () => {
                     </button>
                 </div>
             )}
-    
+
             {/* Mensaje de error general */}
             {errorMessage && (
                 <div className="text-red-500 font-bold mb-6">{errorMessage}</div>
             )}
-    
+
             {/* Tabla de pacientes */}
             <table className="w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden mb-6 text-center">
                 <thead className="bg-blue-200 text-blue-700">
@@ -266,6 +308,7 @@ const SearchPatient = () => {
                         <th className="p-4">Número de identificación</th>
                         <th className="p-4">Ubicación</th>
                         <th className="p-4">Estado</th>
+                        <th className="p-4">Responsable</th> {/* Nueva columna */}
                         <th className="p-4">Editar</th>
                         <th className="p-4">Seleccionar</th>
                     </tr>
@@ -286,15 +329,15 @@ const SearchPatient = () => {
                             <td className="p-4">
                                 <button
                                     onClick={() => handleStatusToggle(patient.id, patient.status)}
-                                    className={`px-6 py-2 rounded-lg ${
-                                        patient.status === "activo"
+                                    className={`px-6 py-2 rounded-lg ${patient.status === "activo"
                                             ? "bg-green-500 hover:bg-green-600"
                                             : "bg-red-500 hover:bg-red-600"
-                                    } text-white font-semibold transition duration-300`}
+                                        } text-white font-semibold transition duration-300`}
                                 >
                                     {patient.status === "activo" ? "Activo" : "Inactivo"}
                                 </button>
                             </td>
+                            <td className="p-4">{patient.responsable_username || "No asignado"}</td> {/* Nuevo dato */}
                             <td className="p-6">
                                 <button
                                     onClick={() => handleEdit(patient.id)}
@@ -306,11 +349,10 @@ const SearchPatient = () => {
                             <td className="p-4">
                                 <button
                                     onClick={() => handleSelectPatient(patient.id)}
-                                    className={`px-6 py-2 rounded-lg ${
-                                        selectedIdPaciente === patient.id
+                                    className={`px-6 py-2 rounded-lg ${selectedIdPaciente === patient.id
                                             ? "bg-blue-600 text-white"
                                             : "bg-gray-300 cursor-not-allowed"
-                                    }`}
+                                        }`}
                                 >
                                     Seleccionar
                                 </button>
@@ -319,16 +361,15 @@ const SearchPatient = () => {
                     ))}
                 </tbody>
             </table>
-    
+
             {/* Paginación */}
             <div className="mt-6 w-full max-w-4xl flex justify-center items-center space-x-6">
                 <button
                     onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-                    className={`px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 ${
-                        currentPage > 1
-                            ? "bg-blue-500 hover:bg-blue-600"
-                            : "bg-gray-300 cursor-not-allowed"
-                    }`}
+                    className={`px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 ${currentPage > 1
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-300 cursor-not-allowed"
+                        }`}
                 >
                     Anterior
                 </button>
@@ -337,39 +378,37 @@ const SearchPatient = () => {
                 </span>
                 <button
                     onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-                    className={`px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 ${
-                        currentPage < totalPages
-                            ? "bg-blue-500 hover:bg-blue-600"
-                            : "bg-gray-300 cursor-not-allowed"
-                    }`}
+                    className={`px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 ${currentPage < totalPages
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-300 cursor-not-allowed"
+                        }`}
                 >
                     Siguiente
                 </button>
             </div>
-    
+
             {/* Botones de acción */}
             <div className="mt-8 flex justify-center w-full max-w-4xl space-x-6">
                 <button
                     onClick={handleGoBack}
-                    className="flex items-center px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all"
+                    className="flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-800 transition-all"
                 >
                     <FiHome className="mr-3" />
                     Menú principal
                 </button>
                 <button
                     onClick={handleRegisterData}
-                    className={`px-6 py-3 text-white font-semibold rounded-lg flex items-center space-x-3 ${
-                        selectedIdPaciente
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "bg-gray-300 cursor-not-allowed"
-                    }`}
+                    className={`px-6 py-3 text-white font-semibold rounded-lg flex items-center space-x-3 ${selectedIdPaciente
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-gray-300 cursor-not-allowed"
+                        }`}
                 >
                     <BiSolidSpreadsheet className="mr-3" />
                     Ir a registros
                 </button>
             </div>
         </div>
-    );     
+    );
 };
 
 export default SearchPatient;
