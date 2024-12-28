@@ -6,7 +6,7 @@ import { getUserInfo } from '../services/authService';
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const [username, setUsername] = useState(localStorage.getItem("username") || "Usuario");
+    const [username, setUsername] = useState(localStorage.getItem("username"));
 
     useEffect(() => {
         const fetchUserInfo = async () => {
