@@ -62,7 +62,7 @@ const Login = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                background: "linear-gradient(135deg, rgba(30,144,255,0.8), rgba(50,205,50,0.8))",
+                background: "linear-gradient(135deg, #90caf9, #1e88e5)", // Más contraste en el degradado
             }}
         >
             <div
@@ -78,18 +78,24 @@ const Login = () => {
                 <div style={{ textAlign: "center", marginBottom: "20px" }}>
                     <div
                         style={{
-                            width: "70px",
-                            height: "70px",
-                            background: "rgba(30,144,255,0.2)",
+                            width: "80px",
+                            height: "80px",
+                            background: "linear-gradient(135deg, #64b5f6, #1e88e5)", // Degradado visible en el círculo
                             borderRadius: "50%",
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
-                            margin: "0 auto",
+                            margin: "0 auto 10px auto",
                         }}
                     >
-                        <FaUser style={{ fontSize: "30px", color: "rgba(30,144,255,0.9)" }} />
+                        <FaUser style={{ fontSize: "36px", color: "white" }} /> {/* Ícono blanco */}
                     </div>
+                    <h2 style={{ color: "#1976d2", fontWeight: "bold", fontSize: "28px", marginBottom: "10px" }}>
+                        ¡Bienvenido de nuevo!
+                    </h2>
+                    <p style={{ color: "#757575", marginBottom: "20px" }}>
+                        Por favor inicie sesión para continuar.
+                    </p>
                 </div>
 
                 <form onSubmit={handleLogin}>
@@ -188,16 +194,21 @@ const Login = () => {
                         style={{
                             width: "100%",
                             padding: "10px",
-                            background: "rgba(50,205,50,0.9)",
+                            background: "linear-gradient(135deg, #42a5f5, #1565c0)", // Degradado con más contraste
                             color: "white",
                             fontWeight: "bold",
                             borderRadius: "25px",
                             border: "none",
                             cursor: "pointer",
-                            transition: "background 0.3s ease",
+                            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+                            transition: "transform 0.3s ease, background 0.3s ease",
                         }}
-                        onMouseEnter={(e) => (e.target.style.background = "rgba(50,205,50,1)")}
-                        onMouseLeave={(e) => (e.target.style.background = "rgba(50,205,50,0.9)")}
+                        onMouseEnter={(e) => {
+                            e.target.style.transform = "scale(1.05)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.transform = "scale(1)";
+                        }}
                     >
                         Iniciar Sesión
                     </button>
