@@ -1,233 +1,364 @@
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import { format } from 'date-fns';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { getUserInfo, updateProfileImage } from "../services/authService";
+import { FaUpload, FaEdit, FaHome, FaTimes, FaUser } from "react-icons/fa";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+const ProfilePage = () => {
+    const [userInfo, setUserInfo] = useState({ username: "", email: "", profile_image: null });
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
+    const navigate = useNavigate();
 
-const VitalSignsChart = ({ records, selectedVariables }) => {
-    const getLabels = () => {
-        return records.map((record, index) => {
-            if (record.record_date && record.record_time) {
-                // Extraer solo la fecha (YYYY-MM-DD) de record_date
-                const datePart = record.record_date.split('T')[0]; 
-                const dateTimeString = `${datePart}T${record.record_time}`;
-    
-                const dateTime = new Date(dateTimeString);
-    
-                if (!isNaN(dateTime)) {
-                    return format(dateTime, 'dd/MM/yyyy HH:mm:ss');
-                } else {
-                    return 'Fecha inválida';
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await getUserInfo();
+                setUserInfo(response.data || {});
+                if (response.data?.profile_image) {
+                    setPreviewImage(`${import.meta.env.VITE_API_URL}/uploads/profile-images/${response.data.profile_image}`);
                 }
-            } else {
-                return 'Fecha/Hora no disponible';
+            } catch (error) {
+                console.error("Error al cargar la información del usuario:", error);
             }
-        });
-    };
-    
-    
-    
-    const createDataset = (label, dataKey, color) => ({
-        label,
-        data: records.map(record => record[dataKey]),
-        borderColor: color,
-        backgroundColor: color,
-        tension: 0.2,
-        fill: false,
-    });
-
-    const colors = {
-        pulso: 'rgb(255, 15, 15)', 
-        temperatura: 'rgb(250, 147, 23)',
-        frecuencia_respiratoria: 'rgb(25, 204, 31)',
-        presion_sistolica: 'rgb(153, 102, 255)',
-        presion_diastolica: 'rgb(204, 25, 163)',
-        saturacion_oxigeno: 'rgb(53, 154, 255)',
-    };
-
-    const data = {
-        labels: getLabels(),
-        datasets: selectedVariables.map(variable =>
-            createDataset(variable, variable, colors[variable])
-        ),
-    };
-
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Signos Vitales del Paciente' },
-        },
-        scales: {
-            x: { title: { display: true, text: 'Fecha' } },
-            y: { title: { display: true, text: 'Valor' }, beginAtZero: true },
-        },
-    };
-
-    // "pulso" 
-    const pulsoData = {
-        labels: getLabels(),
-        datasets: [
-            createDataset('Pulso', 'pulso', colors.pulso), 
-        ],
-    };
-
-    const pulsoOptions = {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Pulso del Paciente' },
-        },
-        scales: {
-            x: { title: { display: true, text: 'Fecha' } },
-            y: { title: { display: true, text: 'Latidos por minuto' }, beginAtZero: true },
-        },
-    };
-
-    // "FR" 
-    const frecuencia_respiratoriaData = {
-        labels: getLabels(),
-        datasets: [
-            createDataset('Frecuencia Respiratoria', 'frecuencia_respiratoria', colors.frecuencia_respiratoria), 
-        ],
-    };
-
-    const frecuencia_respiratoriaOptions = {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Frecuencia Respiratoria' },
-        },
-        scales: {
-            x: { title: { display: true, text: 'Fecha' } },
-            y: { title: { display: true, text: 'Respiraciones por minuto' }, beginAtZero: true },
-        },
-    };
-
-        // "systolic Pressure" 
-    const presion_sistolicaData = {
-        labels: getLabels(),
-        datasets: [
-            createDataset('Presion sistolica', 'presion_sistolica', colors.presion_sistolica), 
-        ],
-    };
-    
-    const presion_sistolicaOptions = {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Presion sistolica del Paciente' },
-        },
-        scales: {
-            x: { title: { display: true, text: 'Fecha' } },
-            y: { title: { display: true, text: 'mmHg' }, beginAtZero: true },
-        },
-    };
-        // "Diastolic Pressure" 
-        const presion_diastolicaData = {
-            labels: getLabels(),
-            datasets: [
-                createDataset('Presion diastolica', 'presion_diastolica', colors.presion_diastolica), 
-            ],
         };
-        
-        const presion_diastolicaOptions = {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                title: { display: true, text: 'Presion diastolica del Paciente' },
-            },
-            scales: {
-                x: { title: { display: true, text: 'Fecha' } },
-                y: { title: { display: true, text: 'mmHg' }, beginAtZero: true },
-            },
-        };
-        
+        fetchUserInfo();
+    }, []);
 
-     // "temperatura" 
-     const temperaturaData = {
-        labels: getLabels(),
-        datasets: [
-            createDataset('Temperatura', 'temperatura', colors.temperatura), 
-        ],
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewImage(URL.createObjectURL(file));
+        }
     };
 
-    const temperaturaOptions = {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Temperatura del Paciente' },
-        },
-        scales: {
-            x: { title: { display: true, text: 'Fecha' } },
-            y: { title: { display: true, text: '°C' }, beginAtZero: true },
-        },
-    };
-    // "saturacion de oxigeno" 
-    const saturacion_oxigenoData = {
-        labels: getLabels(),
-        datasets: [
-            createDataset('Saturacion oxigeno', 'saturacion_oxigeno', colors.saturacion_oxigeno),
-        ],
-    };
+    const handleSubmit = async () => {
+        if (!selectedFile) {
+            Swal.fire({
+                icon: "warning",
+                title: "Atención",
+                text: "Por favor, selecciona una imagen antes de subirla.",
+            });
+            return;
+        }
 
-    const saturacion_oxigenoOptions = {
-        responsive: true,
-        plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'Saturacion de oxigeno del Paciente' },
-        },
-        scales: {
-            x: { title: { display: true, text: 'Fecha' } },
-            y: { title: { display: true, text: '%' }, beginAtZero: true },
-        },
+        const formData = new FormData();
+        formData.append("profileImage", selectedFile);
+
+        try {
+            const response = await updateProfileImage(formData);
+            setUserInfo((prev) => ({ ...prev, profile_image: response.data?.profile_image || null }));
+            setPreviewImage(URL.createObjectURL(selectedFile));
+
+            Swal.fire({
+                icon: "success",
+                title: "Éxito",
+                text: "La imagen de perfil se ha actualizado correctamente.",
+            });
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Hubo un problema al actualizar la imagen. Por favor, inténtalo de nuevo.",
+            });
+        }
     };
 
     return (
-        <div>
-            {/* Gráfico principal de todos los signos vitales */}
-            {/*<Line data={data} options={options} />*/}
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                position: "relative",
+                fontFamily: "Poppins, sans-serif",
+            }}
+        >
+            {/* Fondo degradado con animación */}
+            <div
+                style={{
+                    background: "linear-gradient(135deg,rgb(151, 200, 240), #42a5f5)", // Gradiente azul
+                    animation: "gradient 6s ease infinite",
+                    backgroundSize: "200% 200%",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 0,
+                }}
+            ></div>
 
-            {/* Gráfico de "Pulso"  */}
-            {selectedVariables.includes('pulso') && (
-                <div className="mt-8">
-                    <Line data={pulsoData} options={pulsoOptions} />
-                </div>
-            )}
-            {/* Gráfico de "Temperatura"  */}
-            {selectedVariables.includes('temperatura') && (
-                <div className="mt-8">
-                    <Line data={temperaturaData} options={temperaturaOptions} />
-                </div>
-            )}
-            {/* Gráfico de "FR"  */}
-            {selectedVariables.includes('frecuencia_respiratoria') && (
-                <div className="mt-8">
-                    <Line data={frecuencia_respiratoriaData} options={frecuencia_respiratoriaOptions} />
-                </div>
-            )}
-            {/* Gráfico de "PS"  */}
-            {selectedVariables.includes('presion_sistolica') && (
-                <div className="mt-8">
-                    <Line data={presion_sistolicaData} options={presion_sistolicaOptions} />
-                </div>
-            )}
-            {/* Gráfico de "PD"  */}
-            {selectedVariables.includes('presion_diastolica') && (
-                <div className="mt-8">
-                    <Line data={presion_diastolicaData} options={presion_diastolicaOptions} />
-                </div>
-            )}
-             {/* Gráfico de "FR"  */}
-             {selectedVariables.includes('saturacion_oxigeno') && (
-                <div className="mt-8">
-                    <Line data={ saturacion_oxigenoData} options={ saturacion_oxigenoOptions} />
-                </div>
-            )}
+            {/* Animación de fondo */}
+            <style>
+                {`
+                    @keyframes gradient {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                    }
+                `}
+            </style>
 
+            <div
+                style={{
+                    width: "500px", // Ancho modificado para hacer el cuadro más ancho
+                    padding: "15px",
+                    borderRadius: "20px",
+                    backgroundColor: "#ffffff",
+                    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.2)",
+                    textAlign: "center",
+                    position: "relative",
+                    zIndex: 10,
+                }}
+            >
+                <h1
+                    style={{
+                        fontSize: "32px",
+                        fontWeight: "700",
+                        color: "#1976d2",
+                        marginBottom: "20px",
+                        fontFamily: "Montserrat, sans-serif",
+                    }}
+                >
+                    Mi Perfil
+                </h1>
+
+                <div
+                    style={{
+                        width: "120px",
+                        height: "120px",
+                        margin: "0 auto 15px",
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #64b5f6, #42a5f5)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)",
+                        overflow: "hidden",
+                    }}
+                >
+                    {previewImage ? (
+                        <img
+                            src={previewImage}
+                            alt="Imagen de perfil"
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                            }}
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                setPreviewImage(null); // Si falla, muestra el ícono predeterminado
+                            }}
+                        />
+                    ) : (
+                        <FaUser
+                            style={{
+                                fontSize: "60px", // Tamaño del ícono
+                                color: "white", // Ícono blanco
+                            }}
+                        />
+                    )}
+                </div>
+
+
+                <div
+                    style={{
+                        marginTop: "15px",
+                        background: "#f9f9f9",
+                        borderRadius: "15px",
+                        padding: "15px",
+                        boxShadow: "0 8px 15px rgba(0, 0, 0, 0.1)",
+                        fontSize: "16px",
+                        color: "#333",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                        gap: "8px",
+                    }}
+                >
+                    <div
+                        style={{
+                            width: "100%",
+                            borderBottom: "1px solid #e0e0e0",
+                            paddingBottom: "8px",
+                            marginBottom: "8px",
+                        }}
+                    >
+                        <span
+                            style={{
+                                fontWeight: "600",
+                                color: "#1976d2",
+                                fontSize: "16px",
+                            }}
+                        >
+                            Nombre
+                        </span>
+                        <p
+                            style={{
+                                color: "#757575",
+                                margin: "5px 0",
+                                fontSize: "14px",
+                            }}
+                        >
+                            {userInfo.username || "Nombre Usuario"}
+                        </p>
+                    </div>
+
+                    <div
+                        style={{
+                            width: "100%",
+                            borderBottom: "1px solid #e0e0e0",
+                            paddingBottom: "8px",
+                            marginBottom: "8px",
+                        }}
+                    >
+                        <span
+                            style={{
+                                fontWeight: "600",
+                                color: "#1976d2",
+                                fontSize: "16px",
+                            }}
+                        >
+                            Correo
+                        </span>
+                        <p
+                            style={{
+                                color: "#757575",
+                                margin: "5px 0",
+                                fontSize: "14px",
+                            }}
+                        >
+                            {userInfo.email || "correo@ejemplo.com"}
+                        </p>
+                    </div>
+
+                    <div style={{ width: "100%" }}>
+                        <span
+                            style={{
+                                fontWeight: "600",
+                                color: "#1976d2",
+                                fontSize: "16px",
+                            }}
+                        >
+                            Rol
+                        </span>
+                        <p
+                            style={{
+                                color: "#757575",
+                                margin: "5px 0",
+                                fontSize: "14px",
+                            }}
+                        >
+                            {userInfo.role || "Rol no asignado"}
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    style={{
+                        marginTop: "20px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "15px",
+                    }}
+                >
+                    {/* Botón de Subir Foto */}
+                    <label
+                        htmlFor="fileInput"
+                        style={{
+                            padding: "10px 20px",
+                            backgroundColor: "#1976d2",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            textAlign: "center",
+                            transition: "all 0.3s",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                        }}
+                        onMouseEnter={(e) =>
+                            (e.target.style.transform = "scale(1.05)")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.target.style.transform = "scale(1)")
+                        }
+                    >
+                        <FaUpload /> Subir Foto
+                    </label>
+                    <input
+                        id="fileInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                    />
+
+                    {/* Botón de Cambiar Foto */}
+                    <button
+                        onClick={handleSubmit}
+                        style={{
+                            padding: "10px 20px",
+                            backgroundColor: "#42a5f5",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            transition: "all 0.3s",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                        }}
+                        onMouseEnter={(e) =>
+                            (e.target.style.transform = "scale(1.05)")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.target.style.transform = "scale(1)")
+                        }
+                    >
+                        <FaEdit /> Cambiar Foto de Perfil
+                    </button>
+
+                    {/* Botón de Volver al Menú */}
+                    <button
+                        onClick={() => navigate("/dashboard")}
+                        style={{
+                            padding: "10px 20px",
+                            backgroundColor: "#e0e0e0",
+                            color: "#333333",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            transition: "all 0.3s",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                        }}
+                        onMouseEnter={(e) =>
+                            (e.target.style.transform = "scale(1.05)")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.target.style.transform = "scale(1)")
+                        }
+                    >
+                        <FaHome /> Volver al Menú
+                    </button>
+                </div>
+
+            </div>
         </div>
     );
 };
 
-export default VitalSignsChart;
+export default ProfilePage;
