@@ -42,15 +42,16 @@ const ChangePassword = () => {
 
     return (
         <div className="flex flex-col h-screen items-center justify-center relative">
-            {/* Fondo degradado */}
+            {/* Fondo degradado con animación */}
             <div
-                className="absolute inset-0 z-0"
+                className="absolute inset-0 z-0 animated-gradient"
                 style={{
-                    background: "linear-gradient(135deg, #6dd5ed, #2193b0)", // Degradado en tonos de salud
-                    animation: "gradient 6s ease infinite"
+                    background: "linear-gradient(135deg, #64b5f6, #42a5f5)", // Gradiente azul
+                    animation: "gradient 6s ease infinite",
+                    backgroundSize: "200% 200%",
                 }}
             ></div>
-
+    
             {/* Animación de fondo */}
             <style>
                 {`
@@ -59,16 +60,13 @@ const ChangePassword = () => {
                         50% { background-position: 100% 50%; }
                         100% { background-position: 0% 50%; }
                     }
-                    .animated-gradient {
-                        background-size: 200% 200%;
-                    }
                 `}
             </style>
-
+    
             {/* Formulario */}
             <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl relative z-10">
                 <h2 className="text-center text-3xl font-bold mb-6 text-blue-600">Cambiar contraseña</h2>
-
+    
                 {/* Campo para la nueva contraseña */}
                 <div className="mb-4">
                     <div className="relative">
@@ -91,7 +89,7 @@ const ChangePassword = () => {
                         </span>
                     </div>
                 </div>
-
+    
                 {/* Campo para confirmar la nueva contraseña */}
                 <div className="mb-4">
                     <div className="relative">
@@ -114,11 +112,11 @@ const ChangePassword = () => {
                         </span>
                     </div>
                 </div>
-
+    
                 {/* Mensajes de error y éxito */}
                 {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
                 {success && <p className="text-green-500 text-sm mb-4 text-center">{success}</p>}
-
+    
                 {/* Botón de cambio de contraseña */}
                 <button
                     type="submit"
@@ -127,7 +125,7 @@ const ChangePassword = () => {
                 >
                     Cambiar contraseña
                 </button>
-
+    
                 {/* Enlace para ir al login */}
                 <div className="mt-4 text-center">
                     <button
@@ -139,7 +137,7 @@ const ChangePassword = () => {
                 </div>
             </div>
         </div>
-    );
+    );     
 };
 
 export default ChangePassword;
