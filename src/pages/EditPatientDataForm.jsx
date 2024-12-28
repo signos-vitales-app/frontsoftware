@@ -4,6 +4,7 @@ import { fetchPatientRecord, updatePatientRecord, fetchPatientInfo } from "../se
 import { FiSave } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FiHome } from "react-icons/fi";
 
 const EditPatientDataForm = () => {
     const { idRegistro, idPaciente } = useParams();
@@ -133,19 +134,22 @@ const EditPatientDataForm = () => {
         }
     }; // Aquí cerramos correctamente la función handleSubmit
 
+    const handleGoBack = () => {
+        navigate(-1);
+    };
+
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-5">
+        <div className="flex items-center justify-center h-screen w-screen bg-gray-100 fixed overflow-hidden">
+        <form
+            onSubmit={handleSubmit}
+            className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg grid gap-4 overflow-hidden"
+        >
+            {/* Título */}
             <h1 className="flex items-center gap-3 text-4xl font-extrabold text-blue-500 mb-6">
-                <span className="text-4xl" style={{filter: 'brightness(0) saturate(100%) invert(31%) sepia(81%) saturate(743%) hue-rotate(190deg) brightness(102%) contrast(101%)',}}>
-                    🩺
-                </span>
+                <span className="text-4xl">🩺</span>
                 <span>Editar Registro de Paciente</span>
             </h1>
-
-            <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg grid gap-4"
-            >
+            
                 {/* Fecha y Hora */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -301,12 +305,21 @@ const EditPatientDataForm = () => {
                 </div>
 
                 <div className="flex justify-center gap-4 mt-2">
+                    {/* Botón de Regresar */}
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={handleGoBack}
                         className="flex items-center px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 shadow-md transition"
                     >
-                        <FiSave className="mr-2" />
-                        Guardar Cambios
+                        <FiHome size={20} className="mr-2" /> Regresar
+                    </button>
+
+                    {/* Botón de Guardar Cambios */}
+                    <button
+                        type="submit"
+                        className="flex items-center px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md transition"
+                    >
+                        <FiSave className="mr-2" /> Guardar Cambios
                     </button>
                 </div>
             </form>
