@@ -3,7 +3,8 @@ import autoTable from 'jspdf-autotable';
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords, rangos, chartRef) => {
+const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords, rangos, chartRef, exportTxt = false) => {
+
     try {
 
         // Llamada al backend para registrar la descarga en trazabilidad
@@ -19,7 +20,23 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
         console.log("Descarga registrada exitosamente en trazabilidad.");
 
         // Crear un nuevo documento PDF
-        const doc = new jsPDF();
+        const doc = new jsPDF({ orientation: "landscape" });
+
+        // Configurar el contenido de la primera página
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.text(
+            'Historial Médico del Paciente',
+            doc.internal.pageSize.getWidth() / 2,
+            15,
+            { align: 'center' }
+        );
+
+        // Agregar una línea negra debajo del título
+        const pageWidth = doc.internal.pageSize.getWidth(); // Ancho de la página
+        doc.setDrawColor(0, 0, 0); // Color negro para la línea
+        doc.setLineWidth(0.7); // Grosor de la línea
+        doc.line(10, 20, pageWidth - 10, 20); // Coordenadas (x1, y1, x2, y2)
 
         // Función para formatear la fecha (solo día, mes, año)
         const formatDate = (dateString) => {
@@ -45,10 +62,14 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
                 .join(" ");
         };
 
-        // Título del documento
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
-        doc.text('Historial Médico del Paciente', 20, 20);
+        doc.text(
+            'Historial Médico del Paciente',
+            doc.internal.pageSize.getWidth() / 2,
+            15, // Cambia la posición vertical a 15 para un espaciado uniforme
+            { align: 'center' }
+        );
 
         // Información del paciente
         doc.setFont("helvetica", "bold");
@@ -56,7 +77,7 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
         doc.text("Nombre:", 20, 30);
         doc.text("Tipo de Identificación:", 20, 35);
         doc.text("Número de Identificación:", 20, 40);
-        doc.text("Fecha de Nacimiento:", 20, 45); // Nueva línea para la fecha de nacimiento
+        doc.text("Fecha de Nacimiento:", 20, 45);
         doc.text("Edad:", 20, 50);
         doc.text("Tipo de Paciente:", 20, 55);
         doc.text("Ubicación (habitación):", 20, 60);
@@ -64,7 +85,7 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
 
         doc.setFont("helvetica", "normal");
         doc.text(`${patientInfo.primer_nombre} ${patientInfo.segundo_nombre} ${patientInfo.primer_apellido} ${patientInfo.segundo_apellido}`, 39, 30);
-        doc.text(capitalizeWords(patientInfo.tipo_identificacion), 66, 35); // Aplicado a Tipo de Identificación
+        doc.text(capitalizeWords(patientInfo.tipo_identificacion), 66, 35);
         doc.text(patientInfo.numero_identificacion, 73, 40);
         doc.text(formatDate(patientInfo.fecha_nacimiento), 64, 45);
         doc.text(`${edad} ${ageUnit}`, 33, 50);
@@ -80,15 +101,10 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
         }
         doc.setTextColor(0, 0, 0); // Restablecer color
 
-        // Línea divisoria
-        doc.setLineWidth(0.7);
-        doc.setDrawColor(0, 153, 255); // Azul
-        doc.line(20, 70, 190, 70); // Ajuste en la posición Y de la línea
-
         // Datos de la tabla
         const tableColumns = [
-            "Fecha", "Hora", "Pulso", "T °C", "FR",
-            "TAS", "TAD", "TAM", "SatO2 %", "Peso", "Talla", "Observaciones", "Responsable"
+            "Fecha", "Hora", "Pulso (LPM)", "T °C", "FR (RPM)",
+            "TAS (mmHg)", "TAD (mmHg)", "TAM (mmHg)", "SatO2 %", "Peso (kg)", "Talla (cm)", "Observaciones", "Responsable"
         ];
 
         // Definir los rangos específicos
@@ -222,59 +238,81 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
             ];
         });
 
-
-        // Agregar tabla al PDF
+        // Tabla en la primera página
         autoTable(doc, {
             head: [tableColumns],
             body: tableData,
             startY: 75,
-            theme: 'striped',
+            theme: 'plain',
+            styles: {
+                fontSize: 9,
+                cellPadding: 2,
+                halign: 'center',
+                lineWidth: 0.1,
+                lineColor: [0, 0, 0],
+            },
             headStyles: {
-                fillColor: [54, 162, 235],
-                textColor: 255,
-                fontSize: 9,   // Tamaño de la fuente de los encabezados
+                fillColor: [154, 208, 245],
+                textColor: [0, 0, 0],
+                fontStyle: 'bold',
+                halign: 'center',
+                fontSize: 8,
+                valign: 'middle',
             },
             bodyStyles: {
-                textColor: 50,
-                fontSize: 8,   // Tamaño de la fuente de las celdas
-                fillColor: [255, 255, 255]
+                halign: 'center',
+                textColor: [0, 0, 0],
             },
             alternateRowStyles: {
-                fillColor: [255, 255, 255]
+                fillColor: [245, 245, 245],
+            },
+            columnStyles: {
+                0: { cellWidth: 20, halign: 'center', valign: 'middle' }, // Columna 1 (Ajusta a 30 mm)
+                1: { cellWidth: 20, halign: 'center', valign: 'middle' }, // Columna 2
+                2: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 3
+                3: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 4
+                4: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 5
+                5: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 6
+                6: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 7
+                7: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 8
+                8: { cellWidth: 20, halign: 'center', valign: 'middle' }, // Columna 9
+                9: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 10
+                10: { cellWidth: 15, halign: 'center', valign: 'middle' }, // Columna 11
+                11: { cellWidth: 60, halign: 'center', valign: 'middle' }, // Columna 12
+                12: { cellWidth: 30, halign: 'center', valign: 'middle' }, // Columna 13
             },
         });
 
+        // Agregar una nueva página en orientación vertical
+        doc.addPage("p"); // "p" para orientación vertical
 
         // Espaciado entre la tabla y los gráficos
-        doc.addPage();
         doc.setFontSize(12);
         doc.text('Grafico de signos vitales:', 20, 20);
-
-        // Ajuste de gráficos con márgenes adecuados y espacios
-        let yPosition = 20;
-        const margin = 10;  // Márgenes
-        const maxGraphicsPerPage = 2;  // Número de gráficos por página
-        let graphicsOnCurrentPage = 0;
 
         // Iterar sobre todos los gráficos y agregarlos al PDF
         const canvasElements = chartRef.current.querySelectorAll("canvas");
         canvasElements.forEach((canvas, index) => {
-            // Si los gráficos no caben en una página, agregamos una nueva página
-            if (graphicsOnCurrentPage === maxGraphicsPerPage) {
-                doc.addPage();
-                yPosition = 20; // Resetea la posición Y al inicio de la nueva página
-                graphicsOnCurrentPage = 0;
+            // Si no es la primera gráfica, agrega una nueva página
+            if (index > 0) {
+                doc.addPage(); // Agrega una nueva página para cada gráfica adicional
             }
 
             // Capturar el gráfico como imagen
             const imgData = canvas.toDataURL("image/png");
 
-            // Ajustar la altura y la posición para los gráficos
-            doc.addImage(imgData, "PNG", margin, yPosition, 180, 90);  // Ajusta el tamaño y la posición según sea necesario
+            // Ajustar las dimensiones de la gráfica
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const imgWidth = 250; // Ancho de la gráfica (ajustar según necesidad)
+            const imgHeight = 150; // Altura de la gráfica (ajustar según necesidad)
 
-            // Actualizar la posición Y para el siguiente gráfico
-            yPosition += 110;  // Espacio entre gráficos, puedes ajustar si es necesario
-            graphicsOnCurrentPage++;  // Incrementar el contador de gráficos por página
+            // Calcular las posiciones para centrar la gráfica
+            const xPosition = (pageWidth - imgWidth) / 2;
+            const yPosition = (pageHeight - imgHeight) / 2;
+
+            // Añadir la gráfica al PDF
+            doc.addImage(imgData, "PNG", xPosition, yPosition, imgWidth, imgHeight);
         });
 
         // Formatear el nombre del archivo con el nombre completo del paciente y su número de identificación
@@ -283,55 +321,55 @@ const generatePDF = async (patientInfo, edad, ageUnit, ageGroup, filteredRecords
         // Guardar el PDF generado con el nombre formateado
         doc.save(fileName);
 
-        // Generar archivo TXT
-        let txtContent = `Historial Médico del Paciente\n\n`;
-        txtContent += `Nombre: ${patientInfo.primer_nombre} ${patientInfo.segundo_nombre} ${patientInfo.primer_apellido} ${patientInfo.segundo_apellido}\n`;
-        txtContent += `Tipo de Identificación: ${capitalizeWords(patientInfo.tipo_identificacion)}\n`;
-        txtContent += `Número de Identificación: ${patientInfo.numero_identificacion}\n`;
-        txtContent += `Fecha de Nacimiento: ${formatDate(patientInfo.fecha_nacimiento)}\n`;
-        txtContent += `Edad: ${edad} ${ageUnit}\n`;
-        txtContent += `Tipo de Paciente: ${ageGroup}\n`;
-        txtContent += `Ubicación: ${patientInfo.ubicacion}\n`;
-        txtContent += `Estado: ${patientInfo.status === 'activo' ? 'Activo' : 'Inactivo'}\n\n`;
+        if (exportTxt) {
+            // Generar archivo TXT
+            let txtContent = `Historial Médico del Paciente\n\n`;
+            txtContent += `Nombre: ${patientInfo.primer_nombre} ${patientInfo.segundo_nombre} ${patientInfo.primer_apellido} ${patientInfo.segundo_apellido}\n`;
+            txtContent += `Tipo de Identificación: ${capitalizeWords(patientInfo.tipo_identificacion)}\n`;
+            txtContent += `Número de Identificación: ${patientInfo.numero_identificacion}\n`;
+            txtContent += `Fecha de Nacimiento: ${formatDate(patientInfo.fecha_nacimiento)}\n`;
+            txtContent += `Edad: ${edad} ${ageUnit}\n`;
+            txtContent += `Tipo de Paciente: ${ageGroup}\n`;
+            txtContent += `Ubicación: ${patientInfo.ubicacion}\n`;
+            txtContent += `Estado: ${patientInfo.status === 'activo' ? 'Activo' : 'Inactivo'}\n\n`;
 
-        // Encabezados de la tabla
-        txtContent += `Registros:\n`;
-        txtContent += `${'Fecha'.padEnd(12)}${'Hora'.padEnd(8)}${'Pulso'.padEnd(8)}${'T °C'.padEnd(8)}${'FR'.padEnd(8)}${'TAS'.padEnd(8)}${'TAD'.padEnd(8)}${'TAM'.padEnd(8)}${'SatO2 %'.padEnd(10)}${'Peso'.padEnd(10)}${'Talla'.padEnd(8)}${'Observaciones'.padEnd(20)}${'Responsable'.padEnd(20)}\n`;
+            // Encabezados de la tabla
+            txtContent += `Registros:\n`;
+            txtContent += `${'Fecha'.padEnd(12)}${'Hora'.padEnd(8)}${'Pulso'.padEnd(8)}${'T °C'.padEnd(8)}${'FR'.padEnd(8)}${'TAS'.padEnd(8)}${'TAD'.padEnd(8)}${'TAM'.padEnd(8)}${'SatO2 %'.padEnd(10)}${'Peso'.padEnd(10)}${'Talla'.padEnd(8)}${'Observaciones'.padEnd(20)}${'Responsable'.padEnd(20)}\n`;
 
-        // Registros de la tabla
-        filteredRecords.forEach(record => {
-            txtContent += `${formatDate(record.record_date).padEnd(12)}` +
-                `${record.record_time.padEnd(8)}` +
-                `${record.pulso.toString().padEnd(8)}` +
-                `${record.temperatura.toString().padEnd(8)}` +
-                `${record.frecuencia_respiratoria.toString().padEnd(8)}` +
-                `${record.presion_sistolica.toString().padEnd(8)}` +
-                `${record.presion_diastolica.toString().padEnd(8)}` +
-                `${record.presion_media.toString().padEnd(8)}` +
-                `${record.saturacion_oxigeno.toString().padEnd(10)}` +
-                `${(record.peso_pediatrico || record.peso_adulto || "-").toString().padEnd(10)}` +
-                `${(record.talla || "-").toString().padEnd(8)}` +
-                `${(record.observaciones || "-").padEnd(20)}` +
-                `${(record.responsable_signos || "No disponible").padEnd(20)}\n`;
-        });
+            // Registros de la tabla
+            filteredRecords.forEach(record => {
+                txtContent += `${formatDate(record.record_date).padEnd(12)}` +
+                    `${record.record_time.padEnd(8)}` +
+                    `${record.pulso.toString().padEnd(8)}` +
+                    `${record.temperatura.toString().padEnd(8)}` +
+                    `${record.frecuencia_respiratoria.toString().padEnd(8)}` +
+                    `${record.presion_sistolica.toString().padEnd(8)}` +
+                    `${record.presion_diastolica.toString().padEnd(8)}` +
+                    `${record.presion_media.toString().padEnd(8)}` +
+                    `${record.saturacion_oxigeno.toString().padEnd(10)}` +
+                    `${(record.peso_pediatrico || record.peso_adulto || "-").toString().padEnd(10)}` +
+                    `${(record.talla || "-").toString().padEnd(8)}` +
+                    `${(record.observaciones || "-").padEnd(20)}` +
+                    `${(record.responsable_signos || "No disponible").padEnd(20)}\n`;
+            });
 
-        const sanitize = (str) => {
-            // Normalizar texto para eliminar acentos y caracteres especiales
-            return str
-                .normalize("NFD") // Descompone los caracteres acentuados en su forma base
-                .replace(/[\u0300-\u036f]/g, "") // Elimina los caracteres de marcas diacríticas (acentos)
-                .replace(/[^a-zA-Z0-9]/g, "_"); // Reemplazar caracteres no alfanuméricos por "_"
-        };
-        
-        // Formatear el nombre del archivo con el nombre completo del paciente y su número de identificación
-        const txtFileName = `Historial_Medico_${sanitize(patientInfo.primer_nombre)}_${sanitize(patientInfo.primer_apellido)}_${patientInfo.numero_identificacion}.txt`;
-        
-        // Descargar archivo TXT 
-        const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
-        const txtLink = document.createElement('a');
-        txtLink.href = URL.createObjectURL(blob);
-        txtLink.download = txtFileName;
-        txtLink.click();        
+            const sanitize = (str) => {
+                return str
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-zA-Z0-9]/g, "_");
+            };
+
+            const txtFileName = `Historial_Medico_${sanitize(patientInfo.primer_nombre)}_${sanitize(patientInfo.primer_apellido)}_${patientInfo.numero_identificacion}.txt`;
+
+            // Descargar archivo TXT
+            const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
+            const txtLink = document.createElement('a');
+            txtLink.href = URL.createObjectURL(blob);
+            txtLink.download = txtFileName;
+            txtLink.click();
+        }
 
     } catch (error) {
         console.error("Error generando el PDF:", error);
