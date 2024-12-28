@@ -39,7 +39,7 @@ export const generatePatientPDF = (patientInfo, isPediatric, filteredHistory, fi
         },
         {
           content: record.created_at.split('T')[1].slice(0, 5), // Hora
-          styles: { fillColor: isModified(record.created_at.split('T')[1], nextRecord.created_at?.split('T')[1]) ? [144, 238, 144] : null }
+          styles: { fillColor: isModified(record.created_at.split('T')[1], nextRecord.created_at?.split('T')[1].slice(0, 5)) ? [144, 238, 144] : null }
         },
         { content: record.primer_nombre, styles: { fillColor: isModified(record.primer_nombre, nextRecord.primer_nombre) ? [144, 238, 144] : null } },
         { content: record.segundo_nombre, styles: { fillColor: isModified(record.segundo_nombre, nextRecord.segundo_nombre) ? [144, 238, 144] : null } },
