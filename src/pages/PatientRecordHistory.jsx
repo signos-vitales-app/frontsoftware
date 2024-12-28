@@ -23,7 +23,7 @@ const PatientRecordHistory = () => {
     const [patientInfo, setPatientInfo] = useState({});
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [selectedVariables, setSelectedVariables] = useState(["pulso", "temperatura", "frecuencia_respiratoria", "presion_sistolica", "presion_diastolica", "saturacion_oxigeno"
+    const [selectedVariables, setSelectedVariables] = useState(["pulso", "temperatura", "frecuencia_respiratoria", "presion_sistolica", "presion_diastolica", "saturacion_oxigeno", "presion_media"
     ]);
     const [edad, setEdad] = useState(null);
     const [ageUnit, setAgeUnit] = useState(""); // Unidad de edad: años o meses
@@ -32,6 +32,8 @@ const PatientRecordHistory = () => {
     const [username, setUsername] = useState(''); // Estado para el nombre de usuario
     const [showNormalValues, setShowNormalValues] = useState(false);
     const [showColorSemantics, setShowColorSemantics] = useState(false);
+    const [noRecordsMessage, setNoRecordsMessage] = useState(""); // Mensaje para indicar si no hay registros
+    const [exportTxt, setExportTxt] = useState(false); // Estado para incluir TXT
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -100,22 +102,31 @@ const PatientRecordHistory = () => {
 
     // Maneja el cambio de la fecha de nacimiento
     const handleFechaNacimientoChange = (date) => {
+        if (!date) {
+            setEdad(null);
+            setAgeUnit("");
+            setAgeGroup("");
+            return;
+        }
+    
         const ageInYears = calculateAge(date);
         const ageInMonths = calculateAgeInMonths(date);
-
+    
         if (ageInYears >= 1) {
+            // Si la edad es de 1 año o más
             setEdad(ageInYears);
             setAgeUnit("años");
         } else {
+            // Si la edad es menor de 1 año
             setEdad(ageInMonths);
             setAgeUnit("meses");
         }
-
-        // Calcular el grupo de edad
+    
+        // Calcular y establecer el grupo de edad
         const group = calculateAgeGroup(date);
         setAgeGroup(group);
     };
-
+    
     // Cargar los registros del paciente
     const loadPatientRecords = async () => {
         try {
@@ -174,6 +185,13 @@ const PatientRecordHistory = () => {
             });
             return { ...record, ...filteredRecord };
         });
+
+        // Actualizar mensaje si no hay registros filtrados
+        if (filtered.length === 0) {
+            setNoRecordsMessage("No hay registros en el rango de fechas seleccionado.");
+        } else {
+            setNoRecordsMessage(""); // Restablecer el mensaje si hay registros
+        }
 
         // Actualizar el estado de los registros filtrados
         setFilteredRecords(filteredWithVariables);
@@ -299,7 +317,8 @@ const PatientRecordHistory = () => {
             return;
         }
         try {
-            await generatePDF(patientInfo, edad, ageUnit, ageGroup, filteredRecords, chartRef.current, chartRef, role);
+            // Llama a generatePDF con el estado exportTxt
+            await generatePDF(patientInfo, edad, ageUnit, ageGroup, filteredRecords, vitalSignRanges, chartRef, exportTxt);
         } catch (error) {
             console.error("Error al generar el PDF", error);
         }
@@ -325,6 +344,24 @@ const PatientRecordHistory = () => {
         return <div className="flex justify-center items-center h-screen">Cargando...</div>;
     }
 
+    const capitalizeWords = (text) => {
+        if (!text) return "";
+        // Lista de palabras que deben permanecer en minúscula
+        const lowercaseWords = ["de"];
+
+        return text
+            .split(" ") // Divide el texto en palabras
+            .map((word, index) => {
+                // Convierte la primera letra en mayúscula si no está en la lista de palabras excluidas
+                if (index === 0 || !lowercaseWords.includes(word.toLowerCase())) {
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }
+                // Mantiene la palabra en minúscula
+                return word.toLowerCase();
+            })
+            .join(" "); // Une las palabras nuevamente
+    };
+
     return (
         <div className="flex flex-col items-center min-h-screen bg-white-50 p-14 pl-70 overflow-auto">
             {/* Título principal */}
@@ -347,7 +384,7 @@ const PatientRecordHistory = () => {
                     </span>
                 </div>
 
-                {/* Contenido: Tabla y Notas */}
+                {/* Contenido: Tabla e información */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Tabla de información */}
                     <table className="w-full border-collapse border border-gray-200 text-sm text-gray-700 rounded-lg overflow-hidden shadow-md">
@@ -361,7 +398,7 @@ const PatientRecordHistory = () => {
                             </tr>
                             <tr className="border-b border-white-400 bg-white-100">
                                 <td className="font-bold py-3 px-4">Tipo de Identificación:</td>
-                                <td className="py-3 px-4">{patientInfo.tipo_identificacion}</td>
+                                <td className="py-3 px-4">{capitalizeWords(patientInfo.tipo_identificacion)}</td>
                             </tr>
                             <tr className="border-b border-gray-200 bg-gray-100">
                                 <td className="font-bold py-3 px-4">Número de Identificación:</td>
@@ -375,7 +412,7 @@ const PatientRecordHistory = () => {
                             </tr>
                             <tr className="border-b border-gray-200 bg-gray-100">
                                 <td className="font-bold py-3 px-4">Edad:</td>
-                                <td className="py-3 px-4">{edad ? `${edad} ${ageUnit}` : "No disponible"}</td>
+                                <td className="py-3 px-4">{edad !== null ? `${edad} ${ageUnit}` : "No disponible"}</td>
                             </tr>
                             <tr className="border-b border-white-200 bg-white-100">
                                 <td className="font-bold py-3 px-4">Tipo de Paciente:</td>
@@ -388,7 +425,7 @@ const PatientRecordHistory = () => {
                         </tbody>
                     </table>
 
-                    {/* Nota informativa mejorada */}
+                    {/* Cuadro de información */}
                     <div className="bg-blue-50 p-6 rounded-lg shadow-md">
                         <div className="flex items-center space-x-3 mb-6">
                             {/* Emoji al lado del título */}
@@ -398,7 +435,7 @@ const PatientRecordHistory = () => {
                             </h4>
                         </div>
                         <ul className="list-none text-sm text-gray-800 leading-relaxed space-y-6">
-                            {/* Cada ítem con icono al inicio para destacar */}
+                            {/* Cada ítem con icono al inicio*/}
                             <li className="flex items-start">
                                 <span className="text-blue-500 mr-3 text-lg">✔️</span>
                                 <p className="text-justify">
@@ -455,122 +492,89 @@ const PatientRecordHistory = () => {
                 </div>
 
                 {/* Mostrar contenido de "Valores Normales" */}
-                {showNormalValues && (
-                    <div className="relative mb-6 p-8 bg-white border border-gray-200 rounded-lg shadow-sm w-full max-w-4xl mx-auto animate-fade-in">
+                {showNormalValues && ageGroup && (
+                    <div className="relative mb-6 p-8 bg-white border border-gray-200 rounded-lg shadow-sm w-full max-w-2xl mx-auto animate-fade-in">
                         <h3 className="text-center text-2xl font-extrabold text-blue-600 mb-6">
                             Rangos de Signos Vitales
                         </h3>
-                        <p className="text-center text-base text-gray-600 mb-8">
-                            Hola, <span className="text-blue-500 font-semibold">{username}</span>. Estos son los valores normales según el tipo de paciente.
+                        <p className="text-center text-base text-gray-600 mb-4">
+                            Hola, <span className="text-blue-500 font-semibold">{username}</span>. Estos son los valores normales para un paciente del grupo: <span className="font-bold text-blue-600">{ageGroup}</span>.
                         </p>
-                        <div className="grid grid-cols-2 gap-6">
-                            {/* Pulso */}
-                            <div className="bg-gray-50 p-4 rounded-lg flex items-start space-x-4 shadow-md">
-                                <span className="text-blue-500 text-xl">❤️</span>
-                                <div>
-                                    <h4 className="text-blue-500 font-bold text-base mb-2">Pulso</h4>
-                                    <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-                                        <li>Recién nacido: 90-180 lpm</li>
-                                        <li>Lactante temprano: 80-160 lpm</li>
-                                        <li>Lactante mayor: 80-140 lpm</li>
-                                        <li>Niño pequeño: 75-110 lpm</li>
-                                        <li>Preescolar temprano: 70-110 lpm</li>
-                                        <li>Preescolar tardío: 60-90 lpm</li>
-                                        <li>Adulto: 60-90 lpm</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            {/* Temperatura */}
-                            <div className="bg-gray-50 p-4 rounded-lg flex items-start space-x-4 shadow-md">
-                                <span className="text-blue-500 text-xl">🌡️</span>
-                                <div>
-                                    <h4 className="text-blue-500 font-bold text-base mb-2">Temperatura</h4>
-                                    <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-                                        <li>Recién nacido a Preescolar tardío: 36.0-37.5 °C</li>
-                                        <li>Adulto: 36.5-37.5 °C</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            {/* Frecuencia Respiratoria */}
-                            <div className="bg-gray-50 p-4 rounded-lg flex items-start space-x-4 shadow-md">
-                                <span className="text-blue-500 text-xl">💨</span>
-                                <div>
-                                    <h4 className="text-blue-500 font-bold text-base mb-2">Frecuencia Respiratoria</h4>
-                                    <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-                                        <li>Recién nacido: 30-60 rpm</li>
-                                        <li>Lactante temprano: 30-60 rpm</li>
-                                        <li>Lactante mayor: 24-40 rpm</li>
-                                        <li>Niño pequeño y Preescolar tardío: 20-30 rpm</li>
-                                        <li>Preescolar tardío: 16-24 rpm</li>
-                                        <li>Adulto: 12-16 rpm</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            {/* Presión Sistólica */}
-                            <div className="bg-gray-50 p-4 rounded-lg flex items-start space-x-4 shadow-md">
-                                <span className="text-blue-500 text-xl">🫀</span>
-                                <div>
-                                    <h4 className="text-blue-500 font-bold text-base mb-2">Presión Sistólica</h4>
-                                    <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-                                        <li>Recién nacido: 60-90 mmHg</li>
-                                        <li>Lactante temprano: 80-100 mmHg</li>
-                                        <li>Lactante mayor: 90-110 mmHg</li>
-                                        <li>Niño pequeño: 95-110 mmHg</li>
-                                        <li>Preescolar temprano: 100-120 mmHg</li>
-                                        <li>Preescolar tardío: 105-120 mmHg</li>
-                                        <li>Adulto: 100-140 mmHg</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            {/* Presión Diastólica */}
-                            <div className="bg-gray-50 p-4 rounded-lg flex items-start space-x-4 shadow-md">
-                                <span className="text-blue-500 text-xl">🫀</span>
-                                <div>
-                                    <h4 className="text-blue-500 font-bold text-base mb-2">Presión Diastólica</h4>
-                                    <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-                                        <li>Recién nacido: 30-60 mmHg</li>
-                                        <li>Lactante temprano: 50-70 mmHg</li>
-                                        <li>Lactante mayor: 55-75 mmHg</li>
-                                        <li>Niño pequeño: 60-75 mmHg</li>
-                                        <li>Preescolar temprano: 65-80 mmHg</li>
-                                        <li>Preescolar tardío: 70-85 mmHg</li>
-                                        <li>Adulto: 60-90 mmHg</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            {/* Presión Media */}
-                            <div className="bg-gray-50 p-4 rounded-lg flex items-start space-x-4 shadow-md">
-                                <span className="text-blue-500 text-xl">📊</span>
-                                <div>
-                                    <h4 className="text-blue-500 font-bold text-base mb-2">Presión Media</h4>
-                                    <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-                                        <li>Recién nacido: 50-70 mmHg</li>
-                                        <li>Lactante temprano: 60-85 mmHg</li>
-                                        <li>Lactante mayor: 70-95 mmHg</li>
-                                        <li>Niño pequeño: 75-100 mmHg</li>
-                                        <li>Preescolar temprano: 80-105 mmHg</li>
-                                        <li>Preescolar tardío: 85-110 mmHg</li>
-                                        <li>Adulto: 70-105 mmHg</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            {/* Saturación de Oxígeno */}
-                            <div className="bg-gray-50 p-4 rounded-lg flex items-start space-x-4 shadow-md col-span-2 flex justify-center">
-                                <span className="text-blue-500 text-xl">🫁</span>
-                                <div>
-                                    <h4 className="text-blue-500 font-bold text-base mb-2">Saturación de Oxígeno</h4>
-                                    <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
-                                        <li>Todos los grupos: 95-100%</li>
-                                    </ul>
-                                </div>
-                            </div>
+
+                        {/* Mostrar clasificación específica del paciente */}
+                        <div className="relative mb-6 p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm max-w-2xl mx-auto">
+                            <h4 className="text-center text-lg font-bold text-blue-600 mb-4">
+                                Clasificación de Edad
+                            </h4>
+                            <p className="text-gray-700 text-sm text-center">
+                                <span className="font-semibold text-blue-500">{ageGroup}:</span> {(() => {
+                                    switch (ageGroup) {
+                                        case 'Recién nacido': return '0-3 meses (0 años)';
+                                        case 'Lactante temprano': return '3-6 meses (~0 años)';
+                                        case 'Lactante mayor': return '6-12 meses (~1 año)';
+                                        case 'Niño pequeño': return '1-3 años';
+                                        case 'Preescolar temprano': return '3-6 años';
+                                        case 'Preescolar tardío': return '6-15 años';
+                                        case 'Adulto': return 'Más de 15 años';
+                                        default: return 'Edad desconocida';
+                                    }
+                                })()}
+                            </p>
+                        </div>
+
+                        {/* Generar  las tarjetas */}
+                        <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+                            {Object.keys(vitalSignRanges).map((vitalSignKey, index, array) => {
+                                const range = vitalSignRanges[vitalSignKey][ageGroup];
+                                if (!range) return null; // Si no hay rango definido para este grupo de edad, no mostrar
+
+                                // Etiqueta amigable para los signos vitales
+                                const label = variableLabels[vitalSignKey] || vitalSignKey;
+
+                                // Unidades de medida
+                                const unit =
+                                    vitalSignKey === "temperatura"
+                                        ? "°C"
+                                        : vitalSignKey === "saturacion_oxigeno"
+                                            ? "%"
+                                            : "mmHg";
+
+                                // Íconos personalizados para cada signo vital
+                                const icons = {
+                                    pulso: "❤️", // Pulso
+                                    temperatura: "🌡️", // Temperatura
+                                    frecuencia_respiratoria: "💨", // Frecuencia respiratoria
+                                    presion_sistolica: "🫀", // Presión sistólica
+                                    presion_diastolica: "🫀", // Presión diastólica
+                                    presion_media: "📊", // Presión media
+                                    saturacion_oxigeno: "🫁", // Saturación de oxígeno
+                                };
+
+                                // Clase para centrar y reducir el ancho de la última tarjeta
+                                const isLastCard = index === array.length - 1;
+
+                                return (
+                                    <div
+                                        key={vitalSignKey}
+                                        className={`bg-gray-50 p-4 rounded-lg flex items-start space-x-2 shadow-md ${isLastCard ? "col-span-2 mx-auto" : ""}`}
+                                        style={isLastCard ? { maxWidth: "300px" } : {}}
+                                    >
+                                        <span className="text-blue-500 text-xl">{icons[vitalSignKey]}</span>
+                                        <div>
+                                            <h4 className="text-blue-500 font-bold text-base mb-2">{label}</h4>
+                                            <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+                                                <li>{`Rango: ${range.min}-${range.max} ${unit}`}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                         <p className="text-center text-xs mt-8 text-gray-500">
-                            Estos valores son aproximados y pueden variar según el contexto médico.
+                            Estos valores te ayudarán a monitorear y entender mejor la salud del paciente.
                         </p>
                     </div>
-                )
-                }
+                )}
 
                 {/* Mostrar contenido de "Semaforización" */}
                 {showColorSemantics && (
@@ -636,152 +640,170 @@ const PatientRecordHistory = () => {
 
                 {/* Tabla */}
                 <div className="bg-white p-0 rounded-lg shadow-md w-full max-w-7xl overflow-x-auto">
-                    <table className="table-auto w-full border-collapse rounded-lg overflow-hidden shadow">
-                        <thead>
-                            <tr className="bg-blue-400 text-white text-sm uppercase font-semibold tracking-wide">
-                                <th className="p-1">Id</th>
-                                <th className="p-1">Fecha</th>
-                                <th className="p-1">Hora</th>
-                                <th className="p-1">Pulso (lpm)</th>
-                                <th className="p-2">T°C</th>
-                                <th className="p-1">FR (RPM)</th>
-                                <th className="p-1">TAS (mmHg)</th>
-                                <th className="p-1">TAD (mmHg)</th>
-                                <th className="p-1">TAM (mmHg)</th>
-                                <th className="p-1">SatO2 (%)</th>
-                                {/* Encabezado dinámico para el peso */}
-                                <th className="p-3">
-                                    {['Recién nacido', 'Lactante temprano', 'Lactante mayor', 'Niño pequeño', 'Preescolar temprano', 'Preescolar tardío'].includes(ageGroup)
-                                        ? "Peso Pediátrico (kg)"
-                                        : "Peso Adulto (kg)"}
-                                </th>
-                                <th className="p-1">Talla (cm)</th>
-                                <th className="p-3 max-w-xs">Observaciones</th>
-                                {role === "jefe" && <th className="p-1">Registrado por</th>}
-                                <th className="p-1">Editar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredRecords.map((record, index) => {
-                                const recordDate = new Date(record.record_date);
-                                const currentDate = new Date();
-                                const isEditable = (currentDate - recordDate) / (1000 * 60 * 60 * 24) <= 1;
-                                const handleForceEdit = async (id) => {
-                                    const result = await Swal.fire({
-                                        title: "¿Forzar edición?",
-                                        text: "Este registro no es editable porque tiene más de 1 día. ¿Quieres continuar?",
-                                        icon: "warning",
-                                        showCancelButton: true,
-                                        confirmButtonColor: "#d33",
-                                        cancelButtonColor: "#3085d6",
-                                        confirmButtonText: "Sí, editar",
-                                        cancelButtonText: "Cancelar",
-                                    });
+                    {noRecordsMessage ? (
+                        <div className="text-center py-6 font-semibold text-lg text-red-500">
+                            {noRecordsMessage}
+                        </div>
+                    ) : (
+                        <table className="table-auto w-full border-collapse rounded-lg overflow-hidden shadow">
+                            <thead>
+                                <tr className="bg-blue-400 text-white text-sm uppercase font-semibold tracking-wide">
+                                    <th className="p-1">Id</th>
+                                    <th className="p-1">Fecha</th>
+                                    <th className="p-1">Hora</th>
+                                    <th className="p-1">Pulso (lpm)</th>
+                                    <th className="p-2">T°C</th>
+                                    <th className="p-1">FR (RPM)</th>
+                                    <th className="p-1">TAS (mmHg)</th>
+                                    <th className="p-1">TAD (mmHg)</th>
+                                    <th className="p-1">TAM (mmHg)</th>
+                                    <th className="p-1">SatO2 (%)</th>
+                                    {/* Encabezado dinámico para el peso */}
+                                    <th className="p-3">
+                                        {['Recién nacido', 'Lactante temprano', 'Lactante mayor', 'Niño pequeño', 'Preescolar temprano', 'Preescolar tardío'].includes(ageGroup)
+                                            ? "Peso Pediátrico (kg)"
+                                            : "Peso Adulto (kg)"}
+                                    </th>
+                                    <th className="p-1">Talla (cm)</th>
+                                    <th className="p-3 max-w-xs">Observaciones</th>
+                                    {role === "jefe" && <th className="p-1">Registrado por</th>}
+                                    <th className="p-1">Editar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredRecords.map((record, index) => {
+                                    const recordDate = new Date(record.record_date);
+                                    const currentDate = new Date();
+                                    const isEditable = (currentDate - recordDate) / (1000 * 60 * 60 * 24) <= 1;
+                                    const handleForceEdit = async (id) => {
+                                        const result = await Swal.fire({
+                                            title: "¿Forzar edición?",
+                                            text: "Este registro no es editable porque tiene más de 1 día. ¿Quieres continuar?",
+                                            icon: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: "#d33",
+                                            cancelButtonColor: "#3085d6",
+                                            confirmButtonText: "Sí, editar",
+                                            cancelButtonText: "Cancelar",
+                                        });
 
-                                    if (result.isConfirmed) {
-                                        handleEditRecord(id);
-                                    }
-                                };
+                                        if (result.isConfirmed) {
+                                            handleEditRecord(id);
+                                        }
+                                    };
 
-                                return (
-                                    <tr
-                                        key={index}
-                                        className={`text-center ${index % 2 === 0 ? "bg-white" : "bg-white-100"}`}
-                                    >
-                                        <td className="p-3 border text-center">{record.id}</td>
-                                        <td className="p-3 border text-center">{format(new Date(record.record_date), "dd/MM/yyyy")}</td>
-                                        <td className="p-3 border text-center">{record.record_time}</td>
-                                        <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'pulso', record.pulso)}`}>
-                                            {record.pulso}
-                                        </td>
-                                        <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'temperatura', record.temperatura)}`}>
-                                            {record.temperatura}
-                                        </td>
-                                        <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'frecuencia_respiratoria', record.frecuencia_respiratoria)}`}>
-                                            {record.frecuencia_respiratoria}
-                                        </td>
-                                        <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'presion_sistolica', record.presion_sistolica)}`}>
-                                            {record.presion_sistolica}
-                                        </td>
-                                        <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'presion_diastolica', record.presion_diastolica)}`}>
-                                            {record.presion_diastolica}
-                                        </td>
-                                        <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'presion_media', record.presion_media)}`}>
-                                            {record.presion_media}
-                                        </td>
-                                        <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'saturacion_oxigeno', record.saturacion_oxigeno)}`}>
-                                            {record.saturacion_oxigeno}
-                                        </td>
-                                        <td className="p-3 border text-center">
-                                            {['Recién nacido', 'Lactante temprano', 'Lactante mayor', 'Niño pequeño', 'Preescolar temprano', 'Preescolar tardío'].includes(ageGroup)
-                                                ? record.peso_pediatrico
-                                                : record.peso_adulto}
-                                        </td>
-                                        <td className="p-3 border text-center">{record.talla || "-"}</td>
-                                        <td className="p-3 border text-center">
-                                            {record.observaciones || "-"}
-                                        </td>
-                                        {role === "jefe" && (
-                                            <td className="p-3 border text-center">{record.responsable_signos || "No disponible"}</td>)}
+                                    return (
+                                        <tr
+                                            key={index}
+                                            className={`text-center ${index % 2 === 0 ? "bg-white" : "bg-white-100"}`}
+                                        >
+                                            <td className="p-3 border text-center">{record.id}</td>
+                                            <td className="p-3 border text-center">{format(new Date(record.record_date), "dd/MM/yyyy")}</td>
+                                            <td className="p-3 border text-center">{record.record_time}</td>
+                                            <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'pulso', record.pulso)}`}>
+                                                {record.pulso}
+                                            </td>
+                                            <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'temperatura', record.temperatura)}`}>
+                                                {record.temperatura}
+                                            </td>
+                                            <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'frecuencia_respiratoria', record.frecuencia_respiratoria)}`}>
+                                                {record.frecuencia_respiratoria}
+                                            </td>
+                                            <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'presion_sistolica', record.presion_sistolica)}`}>
+                                                {record.presion_sistolica}
+                                            </td>
+                                            <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'presion_diastolica', record.presion_diastolica)}`}>
+                                                {record.presion_diastolica}
+                                            </td>
+                                            <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'presion_media', record.presion_media)}`}>
+                                                {record.presion_media}
+                                            </td>
+                                            <td className={`p-3 border text-center ${getVitalSignBackground(ageGroup, 'saturacion_oxigeno', record.saturacion_oxigeno)}`}>
+                                                {record.saturacion_oxigeno}
+                                            </td>
+                                            <td className="p-3 border text-center">
+                                                {['Recién nacido', 'Lactante temprano', 'Lactante mayor', 'Niño pequeño', 'Preescolar temprano', 'Preescolar tardío'].includes(ageGroup)
+                                                    ? record.peso_pediatrico
+                                                    : record.peso_adulto}
+                                            </td>
+                                            <td className="p-3 border text-center">{record.talla || "-"}</td>
+                                            <td className="p-3 border text-center">
+                                                {record.observaciones || "-"}
+                                            </td>
+                                            {role === "jefe" && (
+                                                <td className="p-3 border text-center">{record.responsable_signos || "No disponible"}</td>)}
 
-                                        {/* Botón de editar */}
-                                        <td className="p-3 border text-center">
-                                            {isEditable ? (
-                                                <button
-                                                    onClick={() => handleEditRecord(record.id)}
-                                                    className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-green-600 transition"
-                                                >
-                                                    <FiEdit className="mr-2" /> Editar
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleForceEdit(record.id)}
-                                                    className="flex items-center px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
-                                                >
-                                                    <FiEdit className="mr-2" /> Forzar
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                            {/* Botón de editar */}
+                                            <td className="p-3 border text-center">
+                                                {isEditable ? (
+                                                    <button
+                                                        onClick={() => handleEditRecord(record.id)}
+                                                        className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-green-600 transition"
+                                                    >
+                                                        <FiEdit className="mr-2" /> Editar
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleForceEdit(record.id)}
+                                                        className="flex items-center px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                                                    >
+                                                        <FiEdit className="mr-2" /> Forzar
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
 
                 {/* Botones de acción */}
-                <div className="flex justify-evenly w-full mt-6 space-x-4">
+                <div className="flex items-center justify-center w-full space-x-6 mt-6">
                     <button
                         onClick={handleNewRecord}
-                        className="flex items-center justify-center px-6 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-green-600 transition"
+                        className="flex items-center justify-center px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition text-sm w-45 h-12"
                     >
                         <FiPlusCircle className="mr-2" /> Agregar Registro
                     </button>
 
                     <button
                         onClick={handleExportPDF}
-                        className="flex items-center justify-center px-6 py-3 bg-gray-500 text-white font-bold rounded-lg hover:bg-green-600 transition"
+                        className="flex items-center justify-center px-6 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition text-sm w-35 h-12"
                     >
-                        <FiDownload className="mr-2" /> Exportar como PDF
+                        <FiDownload className="mr-2" /> Exportar PDF
                     </button>
+
+                    <label
+                        className="flex items-center justify-center px-6 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg border hover:bg-gray-200 transition text-sm w-35 h-12"
+                    >
+                        <input
+                            type="checkbox"
+                            checked={exportTxt}
+                            onChange={(e) => setExportTxt(e.target.checked)}
+                            className="mr-2 accent-blue-500 w-4 h-4"
+                        />
+                        Incluir TXT
+                    </label>
 
                     {role === "jefe" && (
                         <button
                             onClick={handleRedirect}
-                            className="flex items-center justify-center px-6 py-3 bg-gray-500 text-white font-bold rounded-lg hover:bg-blue-600 transition"
+                            className="flex items-center justify-center px-6 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition text-sm w-52 h-12 whitespace-nowrap"
                         >
-                            <MdOutlinePublishedWithChanges className="mr-2" /> Ver Historial de Cambios
+                            <MdOutlinePublishedWithChanges className="mr-2" /> Historial de Cambios
                         </button>
                     )}
 
                     <button
                         onClick={handleGoBack}
-                        className="flex items-center justify-center px-6 py-3 bg-gray-500 text-white font-bold rounded-lg hover:bg-blue-600 transition"
+                        className="flex items-center justify-center px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition text-sm w-35 h-12"
                     >
                         <FiHome className="mr-2" /> Regresar
                     </button>
                 </div>
-            </div >
+            </div>
 
             {/* Variables para graficar */}
             <div className="bg-gray-50 p-6 rounded-lg shadow-lg w-full max-w-7xl mt-6 mb-6">
@@ -795,6 +817,7 @@ const PatientRecordHistory = () => {
                         "frecuencia_respiratoria",
                         "presion_sistolica",
                         "presion_diastolica",
+                        "presion_media",
                         "saturacion_oxigeno"
                     ].map(variable => (
                         <label
@@ -808,7 +831,7 @@ const PatientRecordHistory = () => {
                                 className="mr-3 accent-blue-500 w-5 h-5"
                             />
                             <span className="text-gray-700 font-medium text-sm">
-                                {variableLabels[variable]}
+                                {variableLabels[variable]} {/* Usando etiquetas amigables */}
                             </span>
                         </label>
                     ))}
