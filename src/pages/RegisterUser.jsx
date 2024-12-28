@@ -92,7 +92,7 @@ const RegisterUser = () => {
 
             await register(formData);
             toast.success("Usuario registrado exitosamente!");
-            navigate("/login");
+            navigate("/admin-panel");
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Error en el registro. Intente nuevamente.";
             toast.error(errorMessage);
