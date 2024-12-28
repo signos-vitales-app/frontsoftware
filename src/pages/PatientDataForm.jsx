@@ -56,6 +56,24 @@ const PatientDataForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validar campos obligatorios
+    if (
+        (!pesoAdulto && ageGroup === "Adulto") ||
+        (!pesoPediatrico && ageGroup !== "Adulto") ||
+        !talla ||
+        !temperatura ||
+        !presionSistolica ||
+        !presionDiastolica ||
+        !pulso ||
+        !frecuenciaRespiratoria ||
+        !saturacionOxigeno ||
+        !recordDate ||
+        !recordTime
+    ) {
+        toast.error("Por favor, complete todos los campos.");
+        return;
+    }
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -127,26 +145,51 @@ const PatientDataForm = () => {
                         />
                     </div>
                 </div>
-
+                
                 <div className="grid grid-cols-3 gap-4">
+                {ageGroup !== "Adulto" ? (
+                    <div>
+                        <label className="block text-gray-700 font-medium mb-1">Peso Pediátrico (kg):</label>
+                        <input
+                            type="number"
+                            value={pesoPediatrico}
+                            onChange={(e) => {
+                                setPesoPediatrico(e.target.value);
+                                if (e.target.value) setPesoAdulto("");
+                            }}
+                            disabled={pesoAdulto !== ""}
+                            className={`w-full p-2 border ${
+                                pesoAdulto !== "" ? "bg-gray-200" : "border-gray-300"
+                            } rounded-lg focus:ring-2 focus:ring-blue-400`}
+                        />
+                    </div>
+                ) : (
                     <div>
                         <label className="block text-gray-700 font-medium mb-1">Peso Adulto (kg):</label>
                         <input
                             type="number"
                             value={pesoAdulto}
-                            onChange={(e) => setPesoAdulto(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+                            onChange={(e) => {
+                                setPesoAdulto(e.target.value);
+                                if (e.target.value) setPesoPediatrico("");
+                            }}
+                            required
+                            disabled={pesoPediatrico !== ""}
+                            className={`w-full p-2 border ${
+                                pesoPediatrico !== "" ? "bg-gray-200" : "border-gray-300"
+                            } rounded-lg focus:ring-2 focus:ring-blue-400`}
                         />
                     </div>
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-1">Talla (cm):</label>
-                        <input
-                            type="number"
-                            value={talla}
-                            onChange={(e) => setTalla(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-                        />
-                    </div>
+                )}
+                <div>
+                    <label className="block text-gray-700 font-medium mb-1">Talla (cm):</label>
+                    <input
+                        type="number"
+                        value={talla}
+                        onChange={(e) => setTalla(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+                    />
+                </div>
                     <div>
                         <label className="block text-gray-700 font-medium mb-1">Temperatura (°C):</label>
                         <input
