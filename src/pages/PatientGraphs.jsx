@@ -66,6 +66,11 @@ const PatientGraphs = () => {
             </div>
 
             <div className="w-full max-w-4xl mb-8 bg-white p-6 rounded shadow-lg">
+                <h2 className="text-xl font-semibold mb-4">Presión Media (mmHg)</h2>
+                <Line data={generateChartData("Presión Media (mmHg)", "presion_media")} />
+            </div>
+
+            <div className="w-full max-w-4xl mb-8 bg-white p-6 rounded shadow-lg">
                 <h2 className="text-xl font-semibold mb-4">SatO2 (%)</h2>
                 <Line data={generateChartData("SatO2 (%)", "saturacion_oxigeno")} />
             </div>
