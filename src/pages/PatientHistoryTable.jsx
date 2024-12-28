@@ -3,7 +3,6 @@ import { fetchPatientHistory, fetchPatientInfo, fetchPatientHistoryRecords } fro
 import { useParams, useNavigate } from "react-router-dom";
 import { FiPlusCircle, FiHome, FiX, FiDownload } from "react-icons/fi";
 import { FaTimes, FaFilter } from "react-icons/fa"
-
 import "jspdf-autotable";
 import { generatePatientPDF } from "../services/generatePatientPDF";
 import { toast } from 'react-toastify';  // Importar toast
@@ -25,7 +24,6 @@ const PatientHistoryPage = ({ token }) => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [searchId, setSearchId] = useState("");
-
 
     useEffect(() => {
         const loadPatientData = async () => {
@@ -200,53 +198,57 @@ const PatientHistoryPage = ({ token }) => {
         <div className="flex flex-col items-center min-h-screen bg-white-100 p-16 overflow-auto">
             <h1 className="text-4xl font-bold mb-8 text-blue-600">Trazabilidad del paciente</h1>
             <div id="pdf-content" className="w-full flex flex-col items-center">
-                {/* Filtros alineados horizontalmente */}
-                <div className="flex items-center space-x-4 mb-4">
-                    <div className="flex items-center space-x-2">
-                        <label className="text-sm font-medium" htmlFor="startDate">Fecha de inicio:</label>
-                        <input
-                            type="date"
-                            id="startDate"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="p-2 border rounded w-40"
-                        />
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <label className="text-sm font-medium" htmlFor="endDate">Fecha de fin:</label>
-                        <input
-                            type="date"
-                            id="endDate"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="p-2 border rounded w-40"
-                        />
-                    </div>
-                    <button
-                        onClick={handleFilterHistory}
-                        className="px-4 py-2 bg-blue-500 text-white font-semibold rounded flex items-center space-x-2 hover:bg-blue-600 transition"
-                    >
-                        <FaFilter className="text-sm" />
-                        <span>Filtrar</span>
-                    </button>
-                    <button
-                        onClick={() => {
-                            setStartDate("");
-                            setEndDate("");
-                            setFilteredHistory(history); // Restaura el historial completo
-                        }}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded flex items-center space-x-2 hover:bg-gray-400 transition"
-                    >
-                        <FaTimes className="text-sm" />
-                        <span>Limpiar Filtros</span>
-                    </button>
-                </div>
 
                 {/* Historial del Paciente */}
                 <div className="bg-white p-6 rounded shadow-lg w-full max-w-7xl mb-6 overflow-x-auto">
-                    <h2 className="text-2xl font-bold mb-4 text-center text-gray-700 border-b-2 border-gray-300 pb-2">
+                    <h2 className="text-2xl font-bold mb-4 text-center text-blue-700 border-b-2 border-gray-300 pb-2">
                         Historial de cambios del paciente
                     </h2>
+
+                    {/* Filtros alineados*/}
+                    <div className="flex flex-col items-center mb-4">
+                        <div className="flex flex-wrap justify-center items-center space-x-4">
+                            <div className="flex items-center space-x-2">
+                                <label className="text-sm font-medium" htmlFor="startDate">Fecha de inicio:</label>
+                                <input
+                                    type="date"
+                                    id="startDate"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className="p-2 border rounded w-40"
+                                />
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <label className="text-sm font-medium" htmlFor="endDate">Fecha de fin:</label>
+                                <input
+                                    type="date"
+                                    id="endDate"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className="p-2 border rounded w-40"
+                                />
+                            </div>
+                            <button
+                                onClick={handleFilterHistory}
+                                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded flex items-center space-x-2 hover:bg-blue-600 transition"
+                            >
+                                <FaFilter className="text-sm" />
+                                <span>Filtrar</span>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setStartDate(""); // Limpia el campo de fecha de inicio
+                                    setEndDate("");   // Limpia el campo de fecha de fin
+                                    setSearchId("");  // Limpia el campo de búsqueda por ID
+                                    setFilteredHistory([...history]); // Restaura la tabla con los datos completos
+                                }}
+                                className="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded flex items-center space-x-2 hover:bg-gray-400 transition"
+                            >
+                                <FaTimes className="text-sm" />
+                                <span>Limpiar Filtros</span>
+                            </button>
+                        </div>
+                    </div>
 
                     {filteredHistory.length > 0 ? (
 
@@ -300,21 +302,25 @@ const PatientHistoryPage = ({ token }) => {
                         <div className="text-center text-gray-500">No hay registros en el historial del paciente.</div>
                     )}
                 </div>
-                {/* Filtro por ID */}
-                <div className="mb-4">
-                    <input
-                        type="text"
-                        value={searchId}
-                        onChange={handleSearchIdChange}
-                        placeholder="Buscar por ID de Registro"
-                        className="p-2 border rounded w-full max-w-md"
-                    />
-                </div>
+
                 {/* Signos Vitales */}
                 <div className="bg-white p-6 rounded shadow-lg w-full max-w-7xl mb-6 overflow-x-auto">
-                    <h2 className="text-2xl font-bold mb-4 text-center text-gray-700 border-b-2 border-gray-300 pb-2">
+                    <h2 className="text-2xl font-bold mb-4 text-center text-blue-700 border-b-2 border-gray-300 pb-2">
                         Historial de cambios de los Signos Vitales
                     </h2>
+
+                    {/* Filtro por ID */}
+                    <div className="mb-4 flex justify-center items-center space-x-2">
+                        <label className="text-sm font-medium">Buscar por ID del registro:</label>
+                        <input
+                            type="text"
+                            value={searchId}
+                            onChange={handleSearchIdChange}
+                            placeholder="ID"
+                            className="p-2 border-2 border-gray rounded w-20 text-center"
+                        />
+                    </div>
+
                     {filteredPatientHistory.length > 0 ? (
 
                         <table className="w-full border-collapse table-auto text-sm">
@@ -390,7 +396,7 @@ const PatientHistoryPage = ({ token }) => {
                 <div className="flex justify-center w-full max-w-7xl mt-6 space-x-4">
                     <button
                         onClick={handleGoBack}
-                        className="flex items-center px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+                        className="flex items-center px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
                     >
                         <FiHome className="mr-2" /> Regresar
                     </button>
