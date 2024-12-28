@@ -38,7 +38,7 @@ export const generatePatientPDF = (patientInfo, isPediatric, filteredHistory, fi
           styles: { fillColor: isModified(formatDate(record.created_at.split('T')[0]), formatDate(nextRecord.created_at?.split('T')[0])) ? [144, 238, 144] : null }
         },
         {
-          content: record.created_at.split('T')[1].slice(0, 5), // Hora
+          content: convertToLocalTime(record.created_at), // Convertir hora a local
           styles: { fillColor: isModified(record.created_at.split('T')[1], nextRecord.created_at?.split('T')[1].slice(0, 5)) ? [144, 238, 144] : null }
         },
         { content: record.primer_nombre, styles: { fillColor: isModified(record.primer_nombre, nextRecord.primer_nombre) ? [144, 238, 144] : null } },
@@ -237,4 +237,9 @@ const getChangedClass = (field, currentRecord, prevRecord) => {
     return currentRecord[field] !== prevRecord[field];
   }
   return false;
+};
+// Helper para convertir UTC a la hora local
+const convertToLocalTime = (utcDateStr) => {
+  const date = new Date(utcDateStr); // Crear un objeto Date desde el string UTC
+  return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); // Ajustar a hora local
 };
