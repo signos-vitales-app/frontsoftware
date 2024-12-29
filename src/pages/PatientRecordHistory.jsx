@@ -374,7 +374,7 @@ const PatientRecordHistory = () => {
                 {/* Encabezado con botón de estado */}
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="font-bold text-2xl text-blue-600 underline decoration-blue-400">
-                        Información Personal
+                        Datos del paciente
                     </h3>
                     <span
                         className={`px-6 py-2 rounded-full font-bold text-white text-sm shadow-md ${patientInfo.status === "activo" ? "bg-green-500" : "bg-red-500"
