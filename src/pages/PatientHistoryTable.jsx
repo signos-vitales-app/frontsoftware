@@ -337,11 +337,9 @@ const PatientHistoryPage = ({ token }) => {
                                     <th className="p-3 border-b-2">TAD</th>
                                     <th className="p-3 border-b-2">TAM</th>
                                     <th className="p-3 border-b-2">SatO2</th>
-                                    {isPediatric ? (
-                                        <th className="p-3 border-b-2">Peso Pediátrico</th>
-                                    ) : (
-                                        <th className="p-3 border-b-2">Peso Adulto</th>
-                                    )}
+                                    <th className="p-2 border">
+                                        {['Recién nacido', 'Lactante temprano', 'Lactante mayor', 'Niño pequeño', 'Preescolar temprano', 'Preescolar tardío'].includes(ageGroup) ? "Peso Pediátrico (kg)" : "Peso Adulto (kg)"}
+                                    </th>
                                     <th className="p-3 border-b-2">Talla</th>
                                     <th className="p-3 border-b-2">Observaciones</th>
                                     <th className="p-3 border-b-2">Responsable</th>
@@ -372,11 +370,9 @@ const PatientHistoryPage = ({ token }) => {
                                             <td className={`p-3 border ${getChangedClass('presion_diastolica', currentRecord, prevRecord)}`}>{currentRecord.presion_diastolica}</td>
                                             <td className={`p-3 border ${getChangedClass('presion_media', currentRecord, prevRecord)}`}>{currentRecord.presion_media}</td>
                                             <td className={`p-3 border ${getChangedClass('saturacion_oxigeno', currentRecord, prevRecord)}`}>{currentRecord.saturacion_oxigeno}</td>
-                                            {isPediatric ? (
-                                                <td className={`p-3 border ${getChangedClass('peso_pediatrico', currentRecord, prevRecord)}`}>{currentRecord.peso_pediatrico}</td>
-                                            ) : (
-                                                <td className={`p-3 border ${getChangedClass('peso_adulto', currentRecord, prevRecord)}`}>{currentRecord.peso_adulto}</td>
-                                            )}
+                                            <td className="p-2 border">
+                                                {['Recién nacido', 'Lactante temprano', 'Lactante mayor', 'Niño pequeño', 'Preescolar temprano', 'Preescolar tardío'].includes(ageGroup) ? record.peso_pediatrico : record.peso_adulto}
+                                            </td>
                                             <td className={`p-3 border ${getChangedClass('talla', currentRecord, prevRecord)}`}>{currentRecord.talla}</td>
                                             <td className={`p-3 border ${getChangedClass('observaciones', currentRecord, prevRecord)}`}>{currentRecord.observaciones}</td>
                                             <td className={`p-3 border ${getChangedClass('responsable_signos', currentRecord, prevRecord)}`}>{currentRecord.responsable_signos}</td>
