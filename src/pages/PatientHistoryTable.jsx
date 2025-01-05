@@ -18,6 +18,8 @@ const PatientHistoryPage = ({ token }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedIds, setSelectedIds] = useState(new Set()); // Estado para almacenar IDs seleccionados
+    const [ageUnit, setAgeUnit] = useState(""); // Unidad de edad: años o meses
+    const [ageGroup, setAgeGroup] = useState(""); // Tipo de paciente
 
     const { idPaciente } = useParams();
     const navigate = useNavigate();    // Filtros
