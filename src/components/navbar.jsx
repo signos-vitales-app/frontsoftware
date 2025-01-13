@@ -45,7 +45,7 @@ const handleProfileChange = () => {
           {showDropdown && (
             <div className="dropdown-menu">
               <button onClick={() => setShowProfileModal(true)}>
-                <FaUserCircle size={18} /> Cambiar foto de perfil
+                <FaUserCircle size={18} /> Editar perfil
               </button>
               <button onClick={() => setShowModal(true)}>
                 <FaSignOutAlt size={18} /> Cerrar sesión
@@ -77,9 +77,9 @@ const handleProfileChange = () => {
       {showProfileModal && (
         <div className="modal">
           <div className="modal-content">
-            <h2>¿Seguro deseas cambiar la foto de perfil?</h2>
+            <h2>¿Seguro deseas editar el perfil?</h2>
             <button className="modal-btn yes" onClick={handleProfileChange}>
-              Sí, cambiar
+              Sí, editar
             </button>
             <button
               className="modal-btn no"
