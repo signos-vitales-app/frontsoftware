@@ -29,6 +29,28 @@ export const updatePassword = async (token, newPassword) => {
     return await axios.patch(`${API_URL}/auth/reset-password/${token}`, { newPassword });
 };
 
+// Función para cambiar la contraseña de un usuario autenticado
+export const changePasswordAuthenticated = async (currentPassword, newPassword) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error("Token no encontrado");
+
+    try {
+        const response = await axios.patch(
+            `${API_URL}/auth/change-password`,
+            { currentPassword, newPassword },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error al cambiar la contraseña:", error.response ? error.response.data : error.message);
+        throw error;
+    }    
+};
+
 // Función para obtener la lista de usuarios (usada en el panel de administración)
 export const getUsers = async () => {
     return await axios.get(`${API_URL}/users`);

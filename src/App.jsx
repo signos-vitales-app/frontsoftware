@@ -24,6 +24,7 @@ import EditPatientDataForm from "./pages/EditPatientDataForm"
 import PatientPage from './pages/PatientHistoryTableSignos';
 import TrazabilidadPage from "./pages/TrazabilidadPage";
 import UpdateProfileImage from './pages/UpdateProfileImage';
+import ChangePasswordAuthenticated from './pages/ChangePasswordAuthenticated';
 
 function App() {
     return (
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/patient/:idPaciente/edit-record/:idRegistro" element={<ProtectedRoute><Layout><EditPatientDataForm /></Layout></ProtectedRoute>}/>
                 <Route path="/patient/:idPaciente" element={<ProtectedRoute><Layout><PatientPage /></Layout></ProtectedRoute>} />
                 <Route path="/update-profile" element={<ProtectedRoute><UpdateProfileImage /></ProtectedRoute>} />
+                <Route path="/change-password-authenticated" element={<ProtectedRoute><ChangePasswordAuthenticated /></ProtectedRoute>} />
             
                 {/* Nuevas rutas para registro y búsqueda de usuarios */}
                 <Route path="/register-user" element={<ProtectedRoute><Layout><RegisterUser /></Layout></ProtectedRoute>} />

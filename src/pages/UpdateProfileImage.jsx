@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { getUserInfo, updateProfileImage } from "../services/authService";
-import { FaUpload, FaEdit, FaHome, FaTimes, FaUser } from "react-icons/fa";
+import { FaUpload, FaEdit, FaHome, FaLock, FaUser } from "react-icons/fa";
 
 const ProfilePage = () => {
     const [userInfo, setUserInfo] = useState({ username: "", email: "", profile_image: null });
@@ -326,6 +326,27 @@ const ProfilePage = () => {
                         }
                     >
                         <FaEdit /> Cambiar Foto de Perfil
+                    </button>
+
+                    {/* Botón de Cambiar Contraseña */}
+                    <button
+                        onClick={() => navigate("/change-password-authenticated")}
+                        style={{
+                            padding: "10px 20px",
+                            backgroundColor: "#f44336",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            cursor: "pointer",
+                            transition: "all 0.3s",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                        }}
+                    >
+                        <FaLock /> Cambiar Contraseña
                     </button>
 
                     {/* Botón de Volver al Menú */}
