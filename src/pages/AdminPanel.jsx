@@ -48,13 +48,13 @@ const AdminPanel = () => {
                     className="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
                     whileHover={{ scale: 1.1 }}
-                    onClick={() => navigate("/search-user")}
+                    onClick={() => navigate("/register-user")}
                 >
-                    <FaUserNurse className="text-blue-500 text-6xl mb-6 transform hover:scale-110 transition-transform duration-300" />
-                    <button className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-md hover:bg-blue-700 transition-all duration-300">
-                        Buscar usuario
+                    <FaUserPlus className="text-green-500 text-6xl mb-6 transform hover:scale-110 transition-transform duration-300" />
+                    <button className="px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-md hover:bg-green-700 transition-all duration-300">
+                        Registrar Usuario
                     </button>
                 </motion.div>
 
@@ -63,13 +63,13 @@ const AdminPanel = () => {
                     className="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105"
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
                     whileHover={{ scale: 1.1 }}
-                    onClick={() => navigate("/register-user")}
+                    onClick={() => navigate("/search-user")}
                 >
-                    <FaUserPlus className="text-green-500 text-6xl mb-6 transform hover:scale-110 transition-transform duration-300" />
-                    <button className="px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-md hover:bg-green-700 transition-all duration-300">
-                        Registrar usuario
+                    <FaUserNurse className="text-blue-500 text-6xl mb-6 transform hover:scale-110 transition-transform duration-300" />
+                    <button className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-md hover:bg-blue-700 transition-all duration-300">
+                        Usuarios Registrados
                     </button>
                 </motion.div>
 
