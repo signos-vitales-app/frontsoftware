@@ -26,6 +26,7 @@ const handleProfileChange = () => {
   navigate("/update-profile"); // Redirige a la página de cambio de foto de perfil
 };
 
+
   return (
     <div>
       {/* Navbar */}

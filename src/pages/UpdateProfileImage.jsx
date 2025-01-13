@@ -64,16 +64,20 @@ const ProfilePage = () => {
             });
         }
     };
+    // Mapeo del rol del usuario a un nombre más amigable
+    const getRoleDescription = (role) => {
+        const roleDescriptions = {
+            user: "Enfermero/a",
+            staff: "Médico/a",
+            jefe: "Jefe de Enfermería",
+        };
+        return roleDescriptions[role] || "Rol desconocido";
+    };
 
     return (
         <div
             style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100vh",
-                position: "relative",
-                fontFamily: "Poppins, sans-serif",
+                display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", position: "relative", fontFamily: "Poppins, sans-serif",
             }}
         >
             {/* Fondo degradado con animación */}
@@ -82,12 +86,7 @@ const ProfilePage = () => {
                     background: "linear-gradient(135deg,rgb(151, 200, 240), #42a5f5)", // Gradiente azul
                     animation: "gradient 6s ease infinite",
                     backgroundSize: "200% 200%",
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    zIndex: 0,
+                    position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0,
                 }}
             ></div>
 
@@ -102,44 +101,12 @@ const ProfilePage = () => {
                 `}
             </style>
 
-            <div
-                style={{
-                    width: "500px", // Ancho modificado para hacer el cuadro más ancho
-                    padding: "15px",
-                    borderRadius: "20px",
-                    backgroundColor: "#ffffff",
-                    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.2)",
-                    textAlign: "center",
-                    position: "relative",
-                    zIndex: 10,
-                }}
-            >
-                <h1
-                    style={{
-                        fontSize: "32px",
-                        fontWeight: "700",
-                        color: "#1976d2",
-                        marginBottom: "20px",
-                        fontFamily: "Montserrat, sans-serif",
-                    }}
-                >
+            <div style={{ width: "500px", padding: "15px", borderRadius: "20px", backgroundColor: "#ffffff", boxShadow: "0 15px 35px rgba(0, 0, 0, 0.2)", textAlign: "center", position: "relative", zIndex: 10, }}>
+                <h1 style={{ fontSize: "32px", fontWeight: "700", color: "#1976d2", marginBottom: "20px", fontFamily: "Montserrat, sans-serif", }}>
                     Mi Perfil
                 </h1>
 
-                <div
-                    style={{
-                        width: "120px",
-                        height: "120px",
-                        margin: "0 auto 15px",
-                        borderRadius: "50%",
-                        background: "linear-gradient(135deg, #64b5f6, #42a5f5)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)",
-                        overflow: "hidden",
-                    }}
-                >
+                <div style={{ width: "120px", height: "120px", margin: "0 auto 15px", borderRadius: "50%", background: "linear-gradient(135deg, #64b5f6, #42a5f5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)", overflow: "hidden", }}>
                     {previewImage ? (
                         <img
                             src={previewImage}
@@ -165,29 +132,8 @@ const ProfilePage = () => {
                 </div>
 
 
-                <div
-                    style={{
-                        marginTop: "15px",
-                        background: "#f9f9f9",
-                        borderRadius: "15px",
-                        padding: "15px",
-                        boxShadow: "0 8px 15px rgba(0, 0, 0, 0.1)",
-                        fontSize: "16px",
-                        color: "#333",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start",
-                        gap: "8px",
-                    }}
-                >
-                    <div
-                        style={{
-                            width: "100%",
-                            borderBottom: "1px solid #e0e0e0",
-                            paddingBottom: "8px",
-                            marginBottom: "8px",
-                        }}
-                    >
+                <div style={{ marginTop: "15px", background: "#f9f9f9", borderRadius: "15px", padding: "15px", boxShadow: "0 8px 15px rgba(0, 0, 0, 0.1)", fontSize: "16px", color: "#333", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "8px", }} >
+                    <div style={{ width: "100%", borderBottom: "1px solid #e0e0e0", paddingBottom: "8px", marginBottom: "8px", }}>
                         <span
                             style={{
                                 fontWeight: "600",
@@ -253,7 +199,7 @@ const ProfilePage = () => {
                                 fontSize: "14px",
                             }}
                         >
-                            {userInfo.role || "Rol no asignado"}
+                            {getRoleDescription(userInfo.role)}
                         </p>
                     </div>
                 </div>
