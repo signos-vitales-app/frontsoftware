@@ -276,10 +276,35 @@ const generatePDFTrazabilidad = async (usuarioInfo, trazabilidadData) => {
           drawUserHeader(usuario, rangoFechas);
           firstActionOfUser = false;
         }
-        // Dibuja acción principal
+        // Asignar color según la acción
+        let textColor;
+        switch (accion.accion.toLowerCase()) {  // Convertir todo a minúsculas para evitar discrepancias
+          case "descarga de pdf":
+            textColor = [255, 0, 0]; // Rojo
+            break;
+          case "creación":
+            textColor = [34, 139, 34]; // Verde
+            break;
+          case "cambio de estado del paciente":
+            textColor = [0, 0, 255]; // Azul
+            break;
+          case "actualización de datos del paciente":
+            textColor = [204, 204, 0]; // Amarillo
+            break;
+          case "nuevo registro de signos vitales":
+            textColor = [255, 105, 180]; // Rosado
+            break;
+          case "actualización de signos vitales":
+            textColor = [128, 0, 128]; // Morado
+            break;
+          default:
+            textColor = [41, 76, 119]; // Azul predeterminado
+        }
+
+        // Establecer el color de texto para la acción
         doc.setFont("Times", "bold");
         doc.setFontSize(14);
-        doc.setTextColor(41, 76, 119);
+        doc.setTextColor(...textColor); // Aquí asignamos el color correcto basado en la acción
         doc.text(`Acción: ${accion.accion || "Sin acción"}`, MARGIN_X, startY);
         startY += 8;
 
