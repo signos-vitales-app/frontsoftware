@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchTrazabilidad } from "../services/trazabilidadService";
-import { FaSearch, FaInfoCircle, FaCheck, FaTimes, FaFileExport, FaListAlt, FaFilter} from "react-icons/fa";
+import { FaSearch, FaInfoCircle, FaCheck, FaTimes, FaFileExport, FaListAlt, FaFilter, } from "react-icons/fa";
 import { FiHome } from "react-icons/fi";
 import DetalleTrazabilidadModal from "../components/DetalleTrazabilidadModal";
 import generatePDFTrazabilidad from "../services/generatePDFTrazabilidad";
@@ -21,6 +21,7 @@ const TrazabilidadPage = () => {
   const [mensajeSeleccion, setMensajeSeleccion] = useState("");
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const navigate = useNavigate();
+  const [showNormalAcciones, setShowNormalColors] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -230,6 +231,57 @@ const TrazabilidadPage = () => {
               <span>Limpiar Filtros</span>
             </button>
           </div>
+
+          {/* Botones de "Acciones" */}
+          <div className="flex justify-center space-x-4 mb-6">
+            <button
+              onClick={() => setShowNormalColors((prev) => !prev)}
+              className="flex items-center px-4 py-2 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition"
+            >
+              🧩 Acciones
+            </button>
+          </div>
+
+          {/* Tarjeta debajo del botón de acciones */}
+          {showNormalAcciones && (
+            <div className="bg-white shadow-lg rounded-lg p-6 mb-6 w-full max-w-4xl mx-auto text-center border border-gray-300">
+              <h2 className="text-2xl font-bold text-blue-500 mb-4">Significado de Colores</h2>
+              <p className="text-gray-700 mb-4">
+                Hola, Jefe. Recuerda que cada acción realizada por el usuario estará representada por un color específico, tal como se muestra a continuación:    </p>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <div className="flex flex-col items-center p-4 border border-gray-300 rounded-lg shadow-sm">
+                  <span className="w-4 h-4 rounded-full bg-green-600 mb-2"></span>
+                  <span className="text-green-600 font-bold">Verde: Acción de Creación</span>
+                  <p className="text-center text-gray-600">Se asocia a la creación o registro de un nuevo paciente.</p>
+                </div>
+                <div className="flex flex-col items-center p-4 border border-gray-300 rounded-lg shadow-sm">
+                  <span className="w-4 h-4 rounded-full bg-yellow-600 mb-2"></span>
+                  <span className="text-yellow-600 font-bold">Amarillo: Actualización de datos</span>
+                  <p className="text-center text-gray-600">Se asocia a la actualización de la información del paciente.</p>
+                </div>
+                <div className="flex flex-col items-center p-4 border border-gray-300 rounded-lg shadow-sm">
+                  <span className="w-4 h-4 rounded-full bg-blue-900 mb-2"></span>
+                  <span className="text-blue-900 font-bold">Azul: Cambio de estado</span>
+                  <p className="text-center text-gray-600">Se asocia al cambio de estado de un paciente (activo/inactivo).</p>
+                </div>
+                <div className="flex flex-col items-center p-4 border border-gray-300 rounded-lg shadow-sm">
+                  <span className="w-4 h-4 rounded-full bg-pink-600 mb-2"></span>
+                  <span className="text-pink-600 font-bold">Rosa: Nuevo registro de Signos Vitales</span>
+                  <p className="text-center text-gray-600">Se asocia al registro de nuevos signos vitales del paciente.</p>
+                </div>
+                <div className="flex flex-col items-center p-4 border border-gray-300 rounded-lg shadow-sm">
+                  <span className="w-4 h-4 rounded-full bg-purple-500 mb-2"></span>
+                  <span className="text-purple-500 font-bold">Morado: Actualización de Signos Vitales</span>
+                  <p className="text-center text-gray-600">Se asocia a la actualización de los signos vitales del paciente.</p>
+                </div>
+                <div className="flex flex-col items-center p-4 border border-gray-300 rounded-lg shadow-sm">
+                  <span className="w-4 h-4 rounded-full bg-red-600 mb-2"></span>
+                  <span className="text-red-600 font-bold">Rojo: Descarga de PDF</span>
+                  <p className="text-center text-gray-600">Se asocia a la descarga de un PDF con los datos del paciente.</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="overflow-x-auto bg-white shadow rounded-lg">
             {loading && <p className="text-center text-blue-500 py-4">Cargando registros...</p>}

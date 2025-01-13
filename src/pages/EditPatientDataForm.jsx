@@ -140,16 +140,17 @@ const EditPatientDataForm = () => {
 
     return (
         <div className="flex items-center justify-center h-screen w-screen bg-gray-100 fixed overflow-hidden">
-        <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg grid gap-4 overflow-hidden"
-        >
-            {/* Título */}
-            <h1 className="flex items-center gap-3 text-4xl font-extrabold text-blue-500 mb-6">
-                <span className="text-4xl">🩺</span>
-                <span>Editar Registro de Paciente</span>
-            </h1>
-            
+            <form
+                onSubmit={handleSubmit}
+                className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg grid gap-4 overflow-hidden"
+            >
+                <div className="flex justify-center items-center text-center">
+                    <h1 className="flex items-center gap-3 text-4xl font-extrabold text-blue-500 mb-6">
+                        <span className="text-4xl">🩺</span>
+                        <span>Editar Registro de Paciente</span>
+                    </h1>
+                </div>
+
                 {/* Fecha y Hora */}
                 <div className="grid grid-cols-2 gap-4">
                     <div>

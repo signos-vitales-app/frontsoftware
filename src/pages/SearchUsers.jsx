@@ -97,8 +97,26 @@ const SearchUsers = () => {
         }
     };
 
+    // Nueva función para manejar la confirmación de edición
+    const handleEditUser = async (id, username) => {
+        const result = await Swal.fire({
+            title: "¿Estás seguro?",
+            text: `Estás a punto de editar al usuario "${username}".`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, editar",
+            cancelButtonText: "Cancelar",
+        });
+
+        if (result.isConfirmed) {
+            navigate(`/edit-user/${id}`);
+        }
+    };
+
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen bg-gray-50 p-6">
+        <div className="flex flex-col items-center justify-start min-h-screen bg-white-50 p-6">
             <ToastContainer />
             <h1 className="text-4xl font-bold mb-6 mt-10 text-blue-700">Usuarios Registrados</h1>
             {error && <p className="text-red-500">{error}</p>}
@@ -140,7 +158,7 @@ const SearchUsers = () => {
                                     </td>
                                     <td className="p-4 text-center">
                                         <span
-                                            onClick={() => navigate(`/edit-user/${user.id}`)}
+                                            onClick={() => handleEditUser(user.id, user.username)} // Llamar a la nueva función
                                             className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full text-blue-600 hover:text-blue-800 hover:bg-blue-200 transition-transform transform hover:scale-105 cursor-pointer"
                                             title="Editar usuario"
                                         >
@@ -153,8 +171,8 @@ const SearchUsers = () => {
                                         <button
                                             onClick={() => handleToggleStatus(user.id, user.is_active)}
                                             className={`flex items-center px-4 py-2 text-sm font-medium rounded-md shadow-lg transition-all duration-300 ease-in-out ${user.is_active
-                                                    ? "bg-gray-600 text-white hover:bg-gray-900 hover:scale-105"
-                                                    : "bg-green-600 text-white hover:bg-green-700 hover:scale-105"
+                                                ? "bg-gray-600 text-white hover:bg-gray-900 hover:scale-105"
+                                                : "bg-green-600 text-white hover:bg-green-700 hover:scale-105"
                                                 }`}
                                         >
                                             {user.is_active ? (

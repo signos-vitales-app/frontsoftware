@@ -6,7 +6,7 @@ import { getUserInfo } from '../services/authService';
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const [username, setUsername] = useState(localStorage.getItem("username"));
+    const [username, setUsername] = useState(localStorage.getItem("username") || "Usuario");
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -62,6 +62,25 @@ const Dashboard = () => {
 
                 {/* Action Buttons */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-3xl">
+                <motion.div
+                        className="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 border-2 border-transparent"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: 0.5 }}
+                        whileHover={{ scale: 1.1 }}
+                        onClick={() => navigate("/register-patient")}
+                    >
+                        <FaUserPlus className="text-green-500 text-6xl mb-4 transform hover:scale-110 transition-transform duration-300" />
+                        <button
+                            className="mt-4 px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 hover:scale-105 transition-all duration-300"
+                        >
+                            Registrar Paciente
+                        </button>
+
+                        <p className="mt-6 text-gray-700 text-center">
+                            Agrega un nuevo paciente al sistema.
+                        </p>
+                    </motion.div>
                     {/* Search Patient */}
                     <motion.div
                         className="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 border-2 border-transparent"
@@ -83,25 +102,6 @@ const Dashboard = () => {
                         </p>
                     </motion.div>
 
-                    <motion.div
-                        className="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:scale-105 border-2 border-transparent"
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2, delay: 0.5 }}
-                        whileHover={{ scale: 1.1 }}
-                        onClick={() => navigate("/register-patient")}
-                    >
-                        <FaUserPlus className="text-green-500 text-6xl mb-4 transform hover:scale-110 transition-transform duration-300" />
-                        <button
-                            className="mt-4 px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 hover:scale-105 transition-all duration-300"
-                        >
-                            Registrar Paciente
-                        </button>
-
-                        <p className="mt-6 text-gray-700 text-center">
-                            Agrega un nuevo paciente al sistema.
-                        </p>
-                    </motion.div>
                 </div>
             </div>
         </div>
