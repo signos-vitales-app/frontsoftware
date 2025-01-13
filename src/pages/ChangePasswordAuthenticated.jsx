@@ -174,18 +174,19 @@ const ChangePassword = () => {
                 {/* Formulario de envío */}
                 <form onSubmit={handleChangePassword}>
                     <div className="flex gap-4">
-                        <button
-                            type="submit"
-                            className="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold rounded-full hover:from-blue-600 hover:to-blue-800 transition shadow-lg"
-                        >
-                            Cambiar contraseña
-                        </button>
+                        
                         <button
                             type="button"
                             onClick={() => navigate(-1)} // Retrocede a la página anterior
                             className="w-full p-3 bg-gray-300 text-gray-700 font-bold rounded-full hover:bg-gray-400 transition shadow-lg"
                         >
                             Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            className="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold rounded-full hover:from-blue-600 hover:to-blue-800 transition shadow-lg"
+                        >
+                            Cambiar contraseña
                         </button>
                     </div>
                 </form>
