@@ -71,24 +71,15 @@ const ProfilePage = () => {
             staff: "Médico/a",
             jefe: "Jefe de Enfermería",
         };
-        return roleDescriptions[role] || "Rol desconocido";
+        return roleDescriptions[role] || " ";
     };
 
     return (
         <div
             style={{
-                display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", position: "relative", fontFamily: "Poppins, sans-serif",
-            }}
-        >
+                display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", position: "relative", fontFamily: "Poppins, sans-serif", }} >
             {/* Fondo degradado con animación */}
-            <div
-                style={{
-                    background: "linear-gradient(135deg,rgb(151, 200, 240), #42a5f5)", // Gradiente azul
-                    animation: "gradient 6s ease infinite",
-                    backgroundSize: "200% 200%",
-                    position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0,
-                }}
-            ></div>
+            <div style={{background: "linear-gradient(135deg,rgb(151, 200, 240), #42a5f5)", animation: "gradient 6s ease infinite", backgroundSize: "200% 200%",position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0, }}></div>
 
             {/* Animación de fondo */}
             <style>
@@ -123,11 +114,7 @@ const ProfilePage = () => {
                         />
                     ) : (
                         <FaUser
-                            style={{
-                                fontSize: "60px", // Tamaño del ícono
-                                color: "white", // Ícono blanco
-                            }}
-                        />
+                            style={{ fontSize: "60px",  color: "white", }}/>
                     )}
                 </div>
 
@@ -150,7 +137,7 @@ const ProfilePage = () => {
                                 fontSize: "14px",
                             }}
                         >
-                            {userInfo.username || "Nombre Usuario"}
+                            {userInfo.username || " "}
                         </p>
                     </div>
 
@@ -178,7 +165,7 @@ const ProfilePage = () => {
                                 fontSize: "14px",
                             }}
                         >
-                            {userInfo.email || "correo@ejemplo.com"}
+                            {userInfo.email || " "}
                         </p>
                     </div>
 

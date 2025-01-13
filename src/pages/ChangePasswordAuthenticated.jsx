@@ -54,6 +54,8 @@ const ChangePassword = () => {
             // Si la contraseña actual es correcta y la nueva se actualiza
             toast.success("Contraseña actualizada exitosamente!");
             setError(null);
+            navigate("/login"); // Redirige automáticamente al login después del cambio
+
         } catch (err) {
             // Aquí se manejan otros errores posibles durante el proceso de actualización
             console.error("Error al actualizar la contraseña:", err);  // Para depuración
@@ -171,24 +173,22 @@ const ChangePassword = () => {
 
                 {/* Formulario de envío */}
                 <form onSubmit={handleChangePassword}>
-                    {/* Botón de cambio de contraseña */}
-                    <button
-                        type="submit"
-                        className="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold rounded-full hover:from-blue-600 hover:to-blue-800 transition shadow-lg"
-                    >
-                        Cambiar contraseña
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            type="submit"
+                            className="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold rounded-full hover:from-blue-600 hover:to-blue-800 transition shadow-lg"
+                        >
+                            Cambiar contraseña
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate(-1)} // Retrocede a la página anterior
+                            className="w-full p-3 bg-gray-300 text-gray-700 font-bold rounded-full hover:bg-gray-400 transition shadow-lg"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
                 </form>
-
-                {/* Enlace para ir al login */}
-                <div className="mt-4 text-center">
-                    <button
-                        onClick={() => navigate("/login")}
-                        className="text-blue-500 hover:underline text-sm"
-                    >
-                        Volver al inicio de sesión
-                    </button>
-                </div>
             </div>
 
             {/* Contenedor de notificaciones */}
